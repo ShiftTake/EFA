@@ -3,498 +3,317 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>EditForAll — Turn long videos into viral shorts</title>
-  <meta name="description" content="EditForAll turns YouTube & Google Drive links into captioned shorts with auto-reframe, templates, and virality scoring. Paste link → Get clips → Export." />
-  <meta name="theme-color" content="#0b1220" />
-
-  <!-- Tailwind CDN (MVP). Later: build pipeline -->
+  <title>EditForAll — Viral shorts from a link</title>
+  <meta name="description" content="Paste a YouTube or Google Drive link. EditForAll finds viral moments, auto-reframes to 9:16, and adds dynamic captions. Export in under 5 clicks." />
+  <meta name="theme-color" content="#070b14" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          boxShadow: {
-            soft: "0 12px 40px rgba(0,0,0,.35)",
-          },
+          boxShadow: { soft: "0 18px 55px rgba(0,0,0,.35)" },
           keyframes: {
             floaty: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-6px)" } },
-            glow: { "0%,100%": { opacity: .55 }, "50%": { opacity: .95 } }
+            glow: { "0%,100%": { opacity: .5 }, "50%": { opacity: 1 } }
           },
           animation: {
-            floaty: "floaty 5s ease-in-out infinite",
-            glow: "glow 3.2s ease-in-out infinite"
+            floaty: "floaty 6s ease-in-out infinite",
+            glow: "glow 3s ease-in-out infinite"
           }
         }
       }
     }
   </script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-
   <style>
     :root { color-scheme: dark; }
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    .bg-grid {
-      background-image:
-        radial-gradient(circle at 10% 10%, rgba(99,102,241,.18) 0%, transparent 32%),
-        radial-gradient(circle at 90% 20%, rgba(34,197,94,.10) 0%, transparent 30%),
-        radial-gradient(circle at 50% 80%, rgba(56,189,248,.12) 0%, transparent 35%),
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: auto, auto, auto, 36px 36px, 36px 36px;
-      background-position: center, center, center, center, center;
-    }
     .glass {
-      background: rgba(15, 23, 42, 0.62);
-      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15,23,42,.58);
+      border: 1px solid rgba(148,163,184,.14);
       backdrop-filter: blur(10px);
     }
-    .ringy { box-shadow: 0 0 0 1px rgba(99,102,241,.25), 0 12px 40px rgba(0,0,0,.25); }
-    .badge {
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2, 6, 23, .45);
+    .bgfx {
+      background:
+        radial-gradient(circle at 10% 10%, rgba(99,102,241,.20) 0%, transparent 34%),
+        radial-gradient(circle at 90% 15%, rgba(34,197,94,.10) 0%, transparent 28%),
+        radial-gradient(circle at 55% 95%, rgba(56,189,248,.12) 0%, transparent 38%),
+        linear-gradient(180deg, #070b14 0%, #070b14 65%, #060913 100%);
     }
-    .btn {
-      transition: transform .08s ease, filter .15s ease;
+    .gridfx{
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center;
+      mask-image: radial-gradient(circle at 40% 30%, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
     }
+    .btn { transition: transform .08s ease, filter .15s ease; }
     .btn:active { transform: translateY(1px); }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
-<body class="h-full bg-[#070b14] text-slate-100">
-  <!-- Top background -->
-  <div class="min-h-full bg-grid">
-    <!-- NAV -->
-    <header class="sticky top-0 z-40 border-b border-white/10 bg-[#070b14]/70 backdrop-blur">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <a href="#" class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 ringy flex items-center justify-center font-black text-black">
-            ea
-          </div>
-          <div class="leading-tight">
-            <div class="font-extrabold tracking-tight text-lg">EditForAll</div>
-            <div class="text-xs text-slate-300/80 -mt-0.5">editforall.com</div>
-          </div>
-        </a>
+<body class="h-full text-slate-100 bgfx">
+  <!-- subtle grid overlay -->
+  <div class="pointer-events-none fixed inset-0 gridfx opacity-[.35]"></div>
 
-        <nav class="hidden md:flex items-center gap-8 text-sm text-slate-200">
-          <a class="hover:text-white" href="#how">How it works</a>
-          <a class="hover:text-white" href="#features">Features</a>
-          <a class="hover:text-white" href="#pricing">Pricing</a>
-          <a class="hover:text-white" href="#faq">FAQ</a>
-        </nav>
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#070b14]/65 backdrop-blur">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 shadow-soft flex items-center justify-center font-black text-black">
+          ea
+        </div>
+        <div class="leading-tight">
+          <div class="font-extrabold tracking-tight text-lg">EditForAll</div>
+          <div class="text-xs text-slate-300/80 -mt-0.5">editforall.com</div>
+        </div>
+      </a>
 
-        <div class="flex items-center gap-3">
-          <button id="btnLogin" class="btn hidden sm:inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold border border-white/15 hover:border-white/25 glass">
-            Log in
-          </button>
-          <button id="btnGetStarted" class="btn inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold bg-white text-black hover:brightness-95">
-            Get started
-          </button>
+      <nav class="hidden md:flex items-center gap-8 text-sm text-slate-200/90">
+        <a class="hover:text-white" href="#how">How it works</a>
+        <a class="hover:text-white" href="#features">Features</a>
+        <a class="hover:text-white" href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <button id="btnLogin" class="btn hidden sm:inline-flex rounded-xl px-4 py-2 text-sm font-semibold border border-white/15 hover:border-white/25 glass">
+          Log in
+        </button>
+        <button id="btnPrimaryCta" class="btn inline-flex rounded-xl px-4 py-2 text-sm font-bold bg-white text-black hover:brightness-95">
+          Get clips
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main>
+    <section class="relative">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-14 pb-12">
+        <div class="grid lg:grid-cols-12 gap-10 items-center">
+          <!-- left -->
+          <div class="lg:col-span-7">
+            <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs glass">
+              <span class="h-2 w-2 rounded-full bg-emerald-400 animate-glow"></span>
+              Finished short in <b>under 5 clicks</b>
+            </div>
+
+            <h1 class="mt-5 text-4xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+              Viral shorts from a link —
+              <span class="bg-gradient-to-r from-indigo-300 via-cyan-200 to-emerald-200 bg-clip-text text-transparent">
+                no downloads
+              </span>.
+            </h1>
+
+            <p class="mt-4 text-lg text-slate-200/80 leading-relaxed">
+              Paste a <b>YouTube</b> or <b>Google Drive</b> link. We find hook moments, auto-reframe to 9:16,
+              add dynamic captions, then export.
+            </p>
+
+            <!-- single action input -->
+            <div class="mt-6 glass rounded-2xl p-4">
+              <label class="text-xs text-slate-300">Paste video link</label>
+              <div class="mt-2 flex flex-col sm:flex-row gap-2">
+                <input id="linkInput" type="url"
+                  class="w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60"
+                  placeholder="https://youtube.com/watch?v=...  or  https://drive.google.com/file/d/..."
+                  value="https://youtube.com/watch?v=dQw4w9WgXcQ"
+                />
+                <button id="btnGetClips" class="btn rounded-xl px-5 py-3 text-sm font-black bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95">
+                  Get clips
+                </button>
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-300/90">
+                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Whisper transcription</span>
+                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Hook + laughter detection</span>
+                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Auto 9:16 reframe</span>
+                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Hormozi captions</span>
+              </div>
+            </div>
+
+            <div class="mt-5 text-sm text-slate-400">
+              Demo UI with dummy data • Firebase-ready • Replace auth + API calls later
+            </div>
+          </div>
+
+          <!-- right: simple preview -->
+          <div class="lg:col-span-5">
+            <div class="glass rounded-3xl p-5 shadow-soft relative overflow-hidden">
+              <div class="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl"></div>
+              <div class="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-cyan-400/15 blur-3xl"></div>
+
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-bold">Suggested clips</div>
+                <button id="btnOpenLogin" class="text-xs underline text-slate-300 hover:text-white">Log in</button>
+              </div>
+
+              <div id="clipList" class="mt-4 space-y-3"></div>
+
+              <div class="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
+                <div class="flex items-center justify-between">
+                  <div class="text-xs text-slate-400">Virality score</div>
+                  <div id="viralityPct" class="text-sm font-black">—</div>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div id="viralityBar" class="h-full w-[0%] bg-gradient-to-r from-emerald-200 to-cyan-200"></div>
+                </div>
+                <div class="mt-2 text-[11px] text-slate-400">
+                  Hook strength + pacing + energy (demo)
+                </div>
+              </div>
+
+              <button id="btnExportDemo" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+                Export (demo)
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </header>
+    </section>
 
-    <!-- HERO -->
-    <main>
-      <section class="relative">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-10">
-          <div class="grid lg:grid-cols-12 gap-10 items-center">
-            <div class="lg:col-span-6">
-              <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs badge text-slate-200">
-                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-glow"></span>
-                Opus-level shorts from a link — in under 5 clicks
-              </div>
+    <!-- HOW -->
+    <section id="how" class="py-12 border-t border-white/10">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 class="text-2xl sm:text-3xl font-black tracking-tight">How it works</h2>
+        <p class="mt-2 text-slate-200/75">Your MVP metric: a finished clip in under 5 clicks.</p>
 
-              <h1 class="mt-5 text-4xl sm:text-5xl font-black tracking-tight leading-[1.05]">
-                Turn long videos into
-                <span class="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">
-                  captioned viral shorts
-                </span>
-                — without downloading files.
-              </h1>
-
-              <p class="mt-4 text-lg text-slate-200/85 leading-relaxed">
-                Paste a <b>YouTube</b> or <b>Google Drive</b> link. We transcribe with Whisper-grade accuracy,
-                detect “hook moments,” auto-reframe to 9:16, and export with dynamic captions.
-              </p>
-
-              <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                <div class="flex-1 glass rounded-2xl p-3 border border-white/10">
-                  <label class="text-xs text-slate-300">Paste video link</label>
-                  <div class="mt-2 flex gap-2">
-                    <input id="linkInput" type="url" placeholder="https://youtube.com/watch?v=...  or  https://drive.google.com/file/d/..."
-                      class="w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60"
-                      value="https://youtube.com/watch?v=dQw4w9WgXcQ" />
-                    <button id="btnDemoClips" class="btn rounded-xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95">
-                      Get clips
-                    </button>
-                  </div>
-                  <div class="mt-2 text-xs text-slate-400">
-                    No uploads. Works best for podcasts, tutorials, talking-head, and interviews.
-                  </div>
-                </div>
-
-                <div class="sm:w-52 glass rounded-2xl p-4 border border-white/10 flex flex-col justify-between">
-                  <div class="text-xs text-slate-300">Magic metric</div>
-                  <div class="mt-2 text-2xl font-black">≤ 5 clicks</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Paste → Get clips → Select → Style → Export</div>
-                </div>
-              </div>
-
-              <div class="mt-6 flex flex-wrap gap-2 text-xs text-slate-300/90">
-                <span class="badge rounded-full px-3 py-1">Whisper transcription</span>
-                <span class="badge rounded-full px-3 py-1">Hook / laughter detection</span>
-                <span class="badge rounded-full px-3 py-1">Face-centric auto-reframe</span>
-                <span class="badge rounded-full px-3 py-1">Hormozi-style captions</span>
-              </div>
-            </div>
-
-            <!-- HERO PREVIEW -->
-            <div class="lg:col-span-6">
-              <div class="glass rounded-3xl p-5 border border-white/10 shadow-soft relative overflow-hidden">
-                <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl"></div>
-                <div class="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl"></div>
-
-                <div class="flex items-center justify-between">
-                  <div class="text-sm font-semibold text-slate-200">Preview</div>
-                  <div class="text-xs text-slate-400">Demo UI • Dummy data</div>
-                </div>
-
-                <div class="mt-4 grid sm:grid-cols-2 gap-4">
-                  <div class="rounded-2xl bg-black/35 border border-white/10 p-4">
-                    <div class="text-xs text-slate-400">Clip suggestions</div>
-                    <div class="mt-3 space-y-3" id="clipList">
-                      <!-- Filled by JS -->
-                    </div>
-                  </div>
-
-                  <div class="rounded-2xl bg-black/35 border border-white/10 p-4">
-                    <div class="flex items-center justify-between">
-                      <div class="text-xs text-slate-400">Caption template</div>
-                      <span class="text-[11px] badge rounded-full px-2 py-1">Template pack</span>
-                    </div>
-
-                    <div class="mt-3 grid grid-cols-2 gap-2" id="templateGrid">
-                      <!-- Filled by JS -->
-                    </div>
-
-                    <div class="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
-                      <div class="text-xs text-slate-400">Virality score</div>
-                      <div class="mt-2 flex items-center gap-2">
-                        <div class="h-2 flex-1 rounded-full bg-white/10 overflow-hidden">
-                          <div id="viralityBar" class="h-full w-[72%] bg-gradient-to-r from-emerald-300 to-cyan-300"></div>
-                        </div>
-                        <div id="viralityPct" class="text-sm font-black">72</div>
-                      </div>
-                      <div class="mt-1 text-[11px] text-slate-400">Hook strength + pacing + energy</div>
-                    </div>
-
-                    <button id="btnExportDemo" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-bold bg-white text-black hover:brightness-95">
-                      Export (demo)
-                    </button>
-                  </div>
-                </div>
-
-                <div class="mt-4 text-xs text-slate-400">
-                  Rendering/transcription are backend services (FFmpeg + Whisper/Groq + analysis). This is the frontend shell.
-                </div>
-              </div>
-            </div>
+        <div class="mt-6 grid md:grid-cols-5 gap-3">
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-slate-400">01</div>
+            <div class="mt-1 font-extrabold">Paste link</div>
           </div>
-
-          <!-- SOCIAL PROOF -->
-          <div class="mt-10 grid md:grid-cols-4 gap-3 text-sm text-slate-200/85">
-            <div class="glass rounded-2xl p-4 border border-white/10">
-              <div class="text-xs text-slate-400">Input</div>
-              <div class="mt-1 font-bold">YouTube + Google Drive links</div>
-            </div>
-            <div class="glass rounded-2xl p-4 border border-white/10">
-              <div class="text-xs text-slate-400">Captions</div>
-              <div class="mt-1 font-bold">Word-by-word highlight + emojis</div>
-            </div>
-            <div class="glass rounded-2xl p-4 border border-white/10">
-              <div class="text-xs text-slate-400">Framing</div>
-              <div class="mt-1 font-bold">Face-centric 9:16 auto-reframe</div>
-            </div>
-            <div class="glass rounded-2xl p-4 border border-white/10">
-              <div class="text-xs text-slate-400">UX</div>
-              <div class="mt-1 font-bold">Finished clip in ≤ 5 clicks</div>
-            </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-slate-400">02</div>
+            <div class="mt-1 font-extrabold">Get clips</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-slate-400">03</div>
+            <div class="mt-1 font-extrabold">Select</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-slate-400">04</div>
+            <div class="mt-1 font-extrabold">Pick style</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-slate-400">05</div>
+            <div class="mt-1 font-extrabold">Export</div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- HOW IT WORKS -->
-      <section id="how" class="py-14 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="flex items-end justify-between gap-6 flex-wrap">
-            <div>
-              <h2 class="text-3xl font-black tracking-tight">The 5-click workflow</h2>
-              <p class="mt-2 text-slate-200/80">Your MVP “magic metric”: a finished, captioned short without friction.</p>
-            </div>
-            <button class="btn rounded-xl px-4 py-2 text-sm font-semibold border border-white/15 hover:border-white/25 glass" data-scroll="#pricing">
-              See pricing
+    <!-- FEATURES (simplified) -->
+    <section id="features" class="py-12 border-t border-white/10">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="flex items-end justify-between gap-6 flex-wrap">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Must-have features</h2>
+            <p class="mt-2 text-slate-200/75">The non-negotiables users pay for.</p>
+          </div>
+          <div class="text-xs text-slate-400">Phase 1 focus for MVP</div>
+        </div>
+
+        <div class="mt-6 grid md:grid-cols-2 gap-4">
+          <div class="glass rounded-2xl p-5">
+            <div class="font-extrabold">Link-to-Clip Processing</div>
+            <div class="mt-1 text-sm text-slate-200/75">YouTube + Google Drive support (no large uploads).</div>
+          </div>
+          <div class="glass rounded-2xl p-5">
+            <div class="font-extrabold">Whisper Transcription</div>
+            <div class="mt-1 text-sm text-slate-200/75">High accuracy, multi-language captions.</div>
+          </div>
+          <div class="glass rounded-2xl p-5">
+            <div class="font-extrabold">Interest Detection</div>
+            <div class="mt-1 text-sm text-slate-200/75">Detect high energy, laughter, and hook sentences.</div>
+          </div>
+          <div class="glass rounded-2xl p-5">
+            <div class="font-extrabold">Auto Reframe + Captions</div>
+            <div class="mt-1 text-sm text-slate-200/75">Face-centric 9:16 crops + dynamic caption templates.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING (simple) -->
+    <section id="pricing" class="py-12 border-t border-white/10">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Pricing</h2>
+        <p class="mt-2 text-slate-200/75">Placeholder tiers for MVP (swap to Stripe later).</p>
+
+        <div class="mt-6 grid lg:grid-cols-3 gap-4">
+          <div class="glass rounded-2xl p-6">
+            <div class="font-bold">Starter</div>
+            <div class="mt-2 text-4xl font-black">$19<span class="text-base font-semibold text-slate-300">/mo</span></div>
+            <ul class="mt-4 text-sm text-slate-200/80 space-y-2">
+              <li>• 30 exports</li>
+              <li>• 5 caption styles</li>
+              <li>• 1080×1920</li>
+            </ul>
+            <button class="btn mt-5 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95" data-plan="starter">
+              Choose
             </button>
           </div>
 
-          <div class="mt-8 grid md:grid-cols-5 gap-4">
-            <div class="glass rounded-2xl p-5 border border-white/10">
-              <div class="text-xs text-slate-400">01</div>
-              <div class="mt-1 font-extrabold">Paste link</div>
-              <div class="mt-2 text-sm text-slate-200/80">YouTube or Drive. No downloads.</div>
+          <div class="glass rounded-2xl p-6 border border-indigo-400/35 shadow-soft">
+            <div class="flex items-center justify-between">
+              <div class="font-bold">Creator</div>
+              <span class="text-[11px] px-2 py-1 rounded-full border border-white/10 bg-black/20">Popular</span>
             </div>
-            <div class="glass rounded-2xl p-5 border border-white/10">
-              <div class="text-xs text-slate-400">02</div>
-              <div class="mt-1 font-extrabold">Get clips</div>
-              <div class="mt-2 text-sm text-slate-200/80">Energy + hook + laughter detection suggests cut points.</div>
-            </div>
-            <div class="glass rounded-2xl p-5 border border-white/10">
-              <div class="text-xs text-slate-400">03</div>
-              <div class="mt-1 font-extrabold">Select clip</div>
-              <div class="mt-2 text-sm text-slate-200/80">Pick the moment worth posting.</div>
-            </div>
-            <div class="glass rounded-2xl p-5 border border-white/10">
-              <div class="text-xs text-slate-400">04</div>
-              <div class="mt-1 font-extrabold">Pick style</div>
-              <div class="mt-2 text-sm text-slate-200/80">Hormozi-style templates + brand kit (Phase 2).</div>
-            </div>
-            <div class="glass rounded-2xl p-5 border border-white/10">
-              <div class="text-xs text-slate-400">05</div>
-              <div class="mt-1 font-extrabold">Export</div>
-              <div class="mt-2 text-sm text-slate-200/80">Download MP4, or push to drafts (Phase 3).</div>
-            </div>
+            <div class="mt-2 text-4xl font-black">$49<span class="text-base font-semibold text-slate-300">/mo</span></div>
+            <ul class="mt-4 text-sm text-slate-200/80 space-y-2">
+              <li>• 120 exports</li>
+              <li>• Virality scoring</li>
+              <li>• Faster queue</li>
+            </ul>
+            <button class="btn mt-5 w-full rounded-xl px-4 py-3 text-sm font-black bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95" data-plan="creator">
+              Choose
+            </button>
+          </div>
+
+          <div class="glass rounded-2xl p-6">
+            <div class="font-bold">Studio</div>
+            <div class="mt-2 text-4xl font-black">$149<span class="text-base font-semibold text-slate-300">/mo</span></div>
+            <ul class="mt-4 text-sm text-slate-200/80 space-y-2">
+              <li>• 500 exports</li>
+              <li>• Team seats</li>
+              <li>• Advanced layouts</li>
+            </ul>
+            <button class="btn mt-5 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95" data-plan="studio">
+              Choose
+            </button>
           </div>
         </div>
-      </section>
 
-      <!-- FEATURES -->
-      <section id="features" class="py-14 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-black tracking-tight">Built like a real Opus competitor</h2>
-          <p class="mt-2 text-slate-200/80">Non-negotiables first. Competitive edge next. Delighters last.</p>
-
-          <div class="mt-8 grid lg:grid-cols-3 gap-5">
-            <!-- Phase 1 -->
-            <div class="glass rounded-3xl p-6 border border-white/10">
-              <div class="flex items-center justify-between">
-                <div class="text-sm font-bold">Phase 1</div>
-                <span class="badge rounded-full px-3 py-1 text-xs">MVP</span>
-              </div>
-              <div class="mt-4 space-y-3">
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Link-to-Clip Processing</div>
-                  <div class="mt-1 text-sm text-slate-200/80">YouTube + Google Drive links (no uploads).</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Whisper-based Transcription</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Multi-language, high accuracy captions.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">AI Interest Detection</div>
-                  <div class="mt-1 text-sm text-slate-200/80">High-energy speech, laughter, hook sentence detection.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Face-Centric Auto-Reframe</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Crop 16:9 → 9:16 while tracking the speaker.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Dynamic Captions (Hormozi Style)</div>
-                  <div class="mt-1 text-sm text-slate-200/80">3–5 templates, word highlighting + emoji injection.</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Phase 2 -->
-            <div class="glass rounded-3xl p-6 border border-white/10">
-              <div class="flex items-center justify-between">
-                <div class="text-sm font-bold">Phase 2</div>
-                <span class="badge rounded-full px-3 py-1 text-xs">Competitive edge</span>
-              </div>
-              <div class="mt-4 space-y-3">
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Text-Based Video Editing</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Highlight transcript → delete section → re-render.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Virality Scoring</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Rank by hook strength + pacing (WPM).</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Multi-Speaker Layouts</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Auto split-screen for remote podcasts.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Brand Kits</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Save default font + primary color + styles.</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Phase 3 -->
-            <div class="glass rounded-3xl p-6 border border-white/10">
-              <div class="flex items-center justify-between">
-                <div class="text-sm font-bold">Phase 3</div>
-                <span class="badge rounded-full px-3 py-1 text-xs">Retention</span>
-              </div>
-              <div class="mt-4 space-y-3">
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">AI B-Roll Integration</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Suggest stock footage (Pexels/Pixabay hooks).</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Direct-to-Draft Publishing</div>
-                  <div class="mt-1 text-sm text-slate-200/80">Push to TikTok / Shorts without phone downloads.</div>
-                </div>
-                <div class="rounded-2xl bg-black/30 border border-white/10 p-4">
-                  <div class="font-extrabold">Filler Word Removal</div>
-                  <div class="mt-1 text-sm text-slate-200/80">One-click clean: “um”, “uh”, “like”.</div>
-                </div>
-              </div>
-            </div>
+        <div class="mt-6 glass rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="font-extrabold">Want to test the product flow?</div>
+            <div class="text-sm text-slate-200/75 mt-1">Use the demo login and we’ll route users to the dashboard in the next file.</div>
           </div>
-
-          <!-- Stack callout -->
-          <div class="mt-8 glass rounded-3xl p-6 border border-white/10">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <div class="text-sm font-bold">Suggested stack (rapid build)</div>
-                <div class="mt-1 text-slate-200/80 text-sm">
-                  Frontend: Next.js + Tailwind • Backend: FastAPI/Node • Video: FFmpeg • Transcription: Whisper/Groq • Storage: S3/R2
-                </div>
-              </div>
-              <button class="btn rounded-xl px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95" id="btnOpenLogin2">
-                Launch demo login
-              </button>
-            </div>
-          </div>
+          <button id="btnCtaLogin" class="btn rounded-xl px-5 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+            Log in (demo)
+          </button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- PRICING -->
-      <section id="pricing" class="py-14 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-black tracking-tight">Simple pricing that users will pay for</h2>
-          <p class="mt-2 text-slate-200/80">Start cheap, prove time saved, and upsell heavy usage.</p>
-
-          <div class="mt-8 grid lg:grid-cols-3 gap-5">
-            <div class="glass rounded-3xl p-6 border border-white/10">
-              <div class="text-sm font-bold">Starter</div>
-              <div class="mt-2 text-4xl font-black">$19<span class="text-base font-semibold text-slate-300">/mo</span></div>
-              <div class="mt-2 text-sm text-slate-200/80">For solo creators getting consistent.</div>
-              <ul class="mt-5 space-y-2 text-sm text-slate-200/85">
-                <li>• 30 exports / month</li>
-                <li>• YouTube + Drive links</li>
-                <li>• 5 caption templates</li>
-                <li>• 1080×1920 exports</li>
-              </ul>
-              <button class="btn mt-6 w-full rounded-xl px-4 py-3 text-sm font-bold bg-white text-black hover:brightness-95" data-plan="starter">
-                Choose Starter
-              </button>
-            </div>
-
-            <div class="glass rounded-3xl p-6 border border-indigo-400/30 ringy relative">
-              <div class="absolute -top-3 right-4 badge rounded-full px-3 py-1 text-xs">Most popular</div>
-              <div class="text-sm font-bold">Creator</div>
-              <div class="mt-2 text-4xl font-black">$49<span class="text-base font-semibold text-slate-300">/mo</span></div>
-              <div class="mt-2 text-sm text-slate-200/80">For weekly publishing + faster iteration.</div>
-              <ul class="mt-5 space-y-2 text-sm text-slate-200/85">
-                <li>• 120 exports / month</li>
-                <li>• Virality scoring</li>
-                <li>• Brand kit (font + color)</li>
-                <li>• Priority queue</li>
-              </ul>
-              <button class="btn mt-6 w-full rounded-xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95" data-plan="creator">
-                Choose Creator
-              </button>
-            </div>
-
-            <div class="glass rounded-3xl p-6 border border-white/10">
-              <div class="text-sm font-bold">Studio</div>
-              <div class="mt-2 text-4xl font-black">$149<span class="text-base font-semibold text-slate-300">/mo</span></div>
-              <div class="mt-2 text-sm text-slate-200/80">For teams, agencies, and pod networks.</div>
-              <ul class="mt-5 space-y-2 text-sm text-slate-200/85">
-                <li>• 500 exports / month</li>
-                <li>• Multi-speaker layouts</li>
-                <li>• Team workspaces</li>
-                <li>• API access (Phase 2+)</li>
-              </ul>
-              <button class="btn mt-6 w-full rounded-xl px-4 py-3 text-sm font-bold bg-white text-black hover:brightness-95" data-plan="studio">
-                Choose Studio
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-6 text-xs text-slate-400">
-            *Pricing is placeholder for MVP. Swap to Stripe Checkout later.
-          </div>
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-10">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="text-sm text-slate-400">© <span id="year"></span> EditForAll</div>
+        <div class="text-sm text-slate-300/90 flex flex-wrap gap-5">
+          <a href="#how" class="hover:text-white">How</a>
+          <a href="#features" class="hover:text-white">Features</a>
+          <a href="#pricing" class="hover:text-white">Pricing</a>
+          <a href="#" id="btnFooterLogin" class="hover:text-white">Log in</a>
         </div>
-      </section>
-
-      <!-- FAQ -->
-      <section id="faq" class="py-14 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-black tracking-tight">FAQ</h2>
-          <div class="mt-8 grid lg:grid-cols-2 gap-5">
-            <details class="glass rounded-2xl p-5 border border-white/10">
-              <summary class="cursor-pointer font-bold">Do users have to upload files?</summary>
-              <p class="mt-2 text-sm text-slate-200/80">No. MVP supports YouTube and Google Drive links so users don’t download/re-upload huge files.</p>
-            </details>
-            <details class="glass rounded-2xl p-5 border border-white/10">
-              <summary class="cursor-pointer font-bold">What powers the captions?</summary>
-              <p class="mt-2 text-sm text-slate-200/80">Whisper-grade transcription (multi-language). This frontend is wired for easy backend swap (Groq/Whisper, etc.).</p>
-            </details>
-            <details class="glass rounded-2xl p-5 border border-white/10">
-              <summary class="cursor-pointer font-bold">How do you find “viral moments”?</summary>
-              <p class="mt-2 text-sm text-slate-200/80">We score energy (volume spikes), laughter detection, and hook sentences in the first seconds.</p>
-            </details>
-            <details class="glass rounded-2xl p-5 border border-white/10">
-              <summary class="cursor-pointer font-bold">Is it mobile friendly?</summary>
-              <p class="mt-2 text-sm text-slate-200/80">Yes. This landing page is responsive and the dashboard flow can be built mobile-first.</p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- FINAL CTA -->
-      <section class="py-14 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="glass rounded-3xl p-8 border border-white/10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div>
-              <h3 class="text-2xl font-black tracking-tight">Ready to ship the MVP?</h3>
-              <p class="mt-2 text-slate-200/80">
-                Landing page done. Next file will be the dashboard shell with link processing + dummy clips + style picker.
-              </p>
-            </div>
-            <div class="flex gap-3">
-              <button id="btnCtaLogin" class="btn rounded-xl px-5 py-3 text-sm font-bold bg-white text-black hover:brightness-95">
-                Log in (demo)
-              </button>
-              <button id="btnCtaStart" class="btn rounded-xl px-5 py-3 text-sm font-bold bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95">
-                Start creating clips
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FOOTER -->
-      <footer class="border-t border-white/10 py-10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div class="text-sm text-slate-400">© <span id="year"></span> EditForAll. All rights reserved.</div>
-          <div class="text-sm text-slate-300/90 flex flex-wrap gap-5">
-            <a href="#features" class="hover:text-white">Features</a>
-            <a href="#pricing" class="hover:text-white">Pricing</a>
-            <a href="#faq" class="hover:text-white">FAQ</a>
-            <a href="#" id="btnFooterLogin" class="hover:text-white">Log in</a>
-          </div>
-        </div>
-      </footer>
-    </main>
-  </div>
+      </div>
+    </footer>
+  </main>
 
   <!-- LOGIN MODAL -->
   <div id="loginModal" class="fixed inset-0 z-50 hidden">
@@ -504,7 +323,7 @@
         <div class="p-5 border-b border-white/10 flex items-center justify-between">
           <div>
             <div class="text-lg font-black">Log in</div>
-            <div class="text-xs text-slate-400">Demo auth (replace with Firebase Auth)</div>
+            <div class="text-xs text-slate-400">Demo auth now • Firebase Auth later</div>
           </div>
           <button id="btnCloseLogin" class="rounded-xl px-3 py-2 text-sm border border-white/10 hover:border-white/20">
             Close
@@ -512,19 +331,19 @@
         </div>
 
         <div class="p-6">
-          <div class="rounded-2xl bg-black/35 border border-white/10 p-4 text-sm">
+          <div class="rounded-2xl bg-black/25 border border-white/10 p-4 text-sm">
             <div class="font-bold">Dummy test credentials</div>
             <div class="mt-2 grid sm:grid-cols-2 gap-3">
-              <div class="rounded-xl bg-black/30 border border-white/10 p-3">
+              <div class="rounded-xl bg-black/25 border border-white/10 p-3">
                 <div class="text-xs text-slate-400">Email</div>
                 <div class="mono font-semibold" id="dummyEmail">test@editforall.com</div>
               </div>
-              <div class="rounded-xl bg-black/30 border border-white/10 p-3">
+              <div class="rounded-xl bg-black/25 border border-white/10 p-3">
                 <div class="text-xs text-slate-400">Password</div>
                 <div class="mono font-semibold" id="dummyPass">Password123!</div>
               </div>
             </div>
-            <div class="mt-2 text-xs text-slate-400">Tip: click “Use dummy credentials” to auto-fill.</div>
+            <div class="mt-2 text-xs text-slate-400">Click “Use dummy” to auto-fill.</div>
           </div>
 
           <div class="mt-5 grid gap-3">
@@ -538,19 +357,18 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">
-              <button id="btnUseDummy" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-bold border border-white/15 hover:border-white/25">
-                Use dummy credentials
+              <button id="btnUseDummy" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-black border border-white/15 hover:border-white/25">
+                Use dummy
               </button>
-              <button id="btnDoLogin" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95">
+              <button id="btnDoLogin" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-black bg-gradient-to-r from-indigo-500 to-cyan-400 text-black hover:brightness-95">
                 Log in
               </button>
             </div>
 
             <div id="loginMsg" class="text-sm text-slate-300/90"></div>
 
-            <div class="mt-2 text-xs text-slate-400">
-              Firebase integration note: Replace <span class="mono">fakeAuthSignIn()</span> with
-              <span class="mono">signInWithEmailAndPassword(auth, email, password)</span>.
+            <div class="mt-1 text-xs text-slate-400">
+              Firebase later: swap <span class="mono">fakeAuthSignIn()</span> with <span class="mono">signInWithEmailAndPassword()</span>.
             </div>
           </div>
         </div>
@@ -569,7 +387,6 @@
     /***********************
      * Firebase placeholders
      ***********************/
-    // TODO: Replace with your actual Firebase config
     const FIREBASE_CONFIG = {
       apiKey: "DUMMY_API_KEY",
       authDomain: "editforall-dev.firebaseapp.com",
@@ -579,14 +396,8 @@
       appId: "1:000000000000:web:0000000000000000"
     };
 
-    // In future files, you’ll add:
-    // import { initializeApp } from "firebase/app";
-    // import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-    // const app = initializeApp(FIREBASE_CONFIG);
-    // const auth = getAuth(app);
-
     /***********************
-     * Dummy demo data
+     * Dummy demo auth
      ***********************/
     const DUMMY_USER = {
       email: "test@editforall.com",
@@ -595,30 +406,34 @@
       plan: "creator"
     };
 
-    const DUMMY_CLIPS = [
-      { id: "c1", title: "Hook: “Most people get this wrong…”", start: "00:12", dur: "0:18", score: 84, tags: ["hook", "high-energy"] },
-      { id: "c2", title: "Laughter spike + punchline", start: "02:40", dur: "0:22", score: 78, tags: ["laughter", "pacing+"] },
-      { id: "c3", title: "Tactical step-by-step section", start: "07:05", dur: "0:30", score: 71, tags: ["value", "clear"] }
-    ];
+    async function fakeAuthSignIn(email, password){
+      await new Promise(r => setTimeout(r, 400));
+      if(email === DUMMY_USER.email && password === DUMMY_USER.password){
+        return { user: { uid: DUMMY_USER.uid, email: DUMMY_USER.email }, plan: DUMMY_USER.plan };
+      }
+      throw new Error("Invalid email or password.");
+    }
 
-    const CAPTION_TEMPLATES = [
-      { id: "t1", name: "Hormozi Bold", desc: "Big type + highlight" },
-      { id: "t2", name: "Neon Pop", desc: "Glow + emojis" },
-      { id: "t3", name: "Clean Pro", desc: "Minimal, readable" },
-      { id: "t4", name: "Karaoke", desc: "Word-by-word" }
+    /***********************
+     * Dummy clip suggestions
+     ***********************/
+    const DUMMY_CLIPS = [
+      { id: "c1", title: "Hook moment: “Most people miss this…”", start: "00:12", dur: "0:18", score: 84, tags: ["hook", "energy"] },
+      { id: "c2", title: "Laughter spike + punchline", start: "02:40", dur: "0:22", score: 78, tags: ["laughter", "pacing+"] },
+      { id: "c3", title: "Clear step-by-step segment", start: "07:05", dur: "0:30", score: 71, tags: ["value", "clear"] }
     ];
 
     /***********************
-     * UI helpers
+     * Helpers
      ***********************/
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
 
     function toast(msg){
       $("#toastText").textContent = msg;
       $("#toast").classList.remove("hidden");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => $("#toast").classList.add("hidden"), 2200);
+      window.__toastTimer = setTimeout(() => $("#toast").classList.add("hidden"), 2000);
     }
 
     function openLogin(){
@@ -630,41 +445,20 @@
       $("#loginMsg").textContent = "";
     }
 
-    function smoothScrollTo(id){
-      const el = document.querySelector(id);
-      if(!el) return;
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    function setVirality(pct){
+      const p = Math.max(0, Math.min(100, pct));
+      $("#viralityPct").textContent = p;
+      $("#viralityBar").style.width = p + "%";
     }
 
-    /***********************
-     * Dummy auth (replace later)
-     ***********************/
-    async function fakeAuthSignIn(email, password){
-      await new Promise(r => setTimeout(r, 450)); // simulate latency
-      if(email === DUMMY_USER.email && password === DUMMY_USER.password){
-        return { user: { uid: DUMMY_USER.uid, email: DUMMY_USER.email }, plan: DUMMY_USER.plan };
-      }
-      throw new Error("Invalid email or password.");
-    }
-
-    function onAuthSuccess(session){
-      window.__session = session;
-      closeLogin();
-      toast("Logged in (demo). Next: dashboard file.");
-    }
-
-    /***********************
-     * Demo rendering
-     ***********************/
     function renderClips(){
       const wrap = $("#clipList");
       wrap.innerHTML = "";
 
-      DUMMY_CLIPS.forEach((c, idx) => {
-        const row = document.createElement("button");
-        row.className =
-          "w-full text-left rounded-2xl border border-white/10 bg-black/30 p-4 hover:border-white/20 transition";
-        row.innerHTML = `
+      DUMMY_CLIPS.forEach((c, i) => {
+        const b = document.createElement("button");
+        b.className = "w-full text-left rounded-2xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition";
+        b.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="text-sm font-extrabold">${c.title}</div>
@@ -676,38 +470,13 @@
             </div>
           </div>
         `;
-        row.addEventListener("click", () => {
-          // pretend selecting clip changes virality meter
-          const pct = c.score;
-          $("#viralityPct").textContent = pct;
-          $("#viralityBar").style.width = Math.max(10, Math.min(100, pct)) + "%";
-          toast(`Selected clip: ${c.start} (${pct} score)`);
+        b.addEventListener("click", () => {
+          setVirality(c.score);
+          toast(`Selected: ${c.start} (${c.score})`);
         });
-        wrap.appendChild(row);
+        wrap.appendChild(b);
 
-        if(idx === 0){
-          // initialize virality meter
-          $("#viralityPct").textContent = c.score;
-          $("#viralityBar").style.width = c.score + "%";
-        }
-      });
-    }
-
-    function renderTemplates(){
-      const wrap = $("#templateGrid");
-      wrap.innerHTML = "";
-
-      CAPTION_TEMPLATES.forEach((t, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "rounded-xl border border-white/10 bg-black/30 p-3 text-left hover:border-white/20 transition";
-        btn.innerHTML = `
-          <div class="text-sm font-extrabold">${t.name}</div>
-          <div class="text-xs text-slate-400 mt-0.5">${t.desc}</div>
-        `;
-        btn.addEventListener("click", () => toast(`Template selected: ${t.name}`));
-        wrap.appendChild(btn);
-
-        if(idx === 0) btn.classList.add("border-indigo-400/40");
+        if(i === 0) setVirality(c.score);
       });
     }
 
@@ -717,58 +486,33 @@
     window.addEventListener("DOMContentLoaded", () => {
       $("#year").textContent = new Date().getFullYear();
       renderClips();
-      renderTemplates();
 
-      // Nav / CTA buttons
+      // primary CTA mirrors the main button
+      $("#btnPrimaryCta").addEventListener("click", () => $("#btnGetClips").click());
+
+      // login opens
       $("#btnLogin").addEventListener("click", openLogin);
+      $("#btnOpenLogin").addEventListener("click", openLogin);
       $("#btnFooterLogin").addEventListener("click", (e) => { e.preventDefault(); openLogin(); });
-      $("#btnOpenLogin2").addEventListener("click", openLogin);
       $("#btnCtaLogin").addEventListener("click", openLogin);
 
-      $("#btnGetStarted").addEventListener("click", () => smoothScrollTo("#how"));
-      $("#btnCtaStart").addEventListener("click", () => {
-        toast("Next: we’ll build app.html dashboard + Firebase auth + link job queue.");
-      });
-
-      // Scroll helper
-      $$("[data-scroll]").forEach(b => b.addEventListener("click", () => smoothScrollTo(b.getAttribute("data-scroll"))));
-
-      // Demo: Get Clips button
-      $("#btnDemoClips").addEventListener("click", () => {
-        const link = $("#linkInput").value.trim();
-        const ok = /youtube\.com|youtu\.be|drive\.google\.com/i.test(link);
-        if(!ok){
-          toast("Please paste a YouTube or Google Drive link (demo).");
-          return;
-        }
-        toast("Analyzing link (demo)… suggested clips loaded.");
-        // Later: call backend job endpoint + show progress + list results
-        renderClips();
-      });
-
-      // Export demo
-      $("#btnExportDemo").addEventListener("click", () => {
-        toast("Export queued (demo). Next: render pipeline via FFmpeg.");
-      });
-
-      // Pricing choose
-      $$("[data-plan]").forEach(btn => btn.addEventListener("click", () => {
-        toast(`Plan selected: ${btn.getAttribute("data-plan")} (placeholder).`);
-        openLogin();
-      }));
-
-      // Modal controls
+      // modal close
       $("#btnCloseLogin").addEventListener("click", closeLogin);
       $("#loginModal").addEventListener("click", (e) => {
-        if(e.target === $("#loginModal").children[0]) closeLogin(); // clicked backdrop
+        if(e.target === $("#loginModal").children[0]) closeLogin();
+      });
+      window.addEventListener("keydown", (e) => {
+        if(e.key === "Escape" && !$("#loginModal").classList.contains("hidden")) closeLogin();
       });
 
+      // dummy fill
       $("#btnUseDummy").addEventListener("click", () => {
         $("#loginEmail").value = DUMMY_USER.email;
         $("#loginPassword").value = DUMMY_USER.password;
         toast("Dummy credentials filled.");
       });
 
+      // do login (demo)
       $("#btnDoLogin").addEventListener("click", async () => {
         const email = $("#loginEmail").value.trim();
         const password = $("#loginPassword").value;
@@ -777,19 +521,39 @@
 
         try{
           const session = await fakeAuthSignIn(email, password);
+          window.__session = session;
           $("#loginMsg").textContent = "Success!";
           $("#loginMsg").className = "text-sm text-emerald-300 font-semibold";
-          onAuthSuccess(session);
+          closeLogin();
+          toast("Logged in (demo). Next: dashboard file.");
         }catch(err){
           $("#loginMsg").textContent = err.message || "Login failed.";
           $("#loginMsg").className = "text-sm text-rose-300 font-semibold";
         }
       });
 
-      // Keyboard: Esc closes modal
-      window.addEventListener("keydown", (e) => {
-        if(e.key === "Escape" && !$("#loginModal").classList.contains("hidden")) closeLogin();
+      // get clips (demo)
+      $("#btnGetClips").addEventListener("click", () => {
+        const link = $("#linkInput").value.trim();
+        const ok = /youtube\.com|youtu\.be|drive\.google\.com/i.test(link);
+        if(!ok){
+          toast("Paste a YouTube or Google Drive link.");
+          return;
+        }
+        toast("Analyzing (demo)… clips ready.");
+        renderClips();
       });
+
+      // export (demo)
+      $("#btnExportDemo").addEventListener("click", () => {
+        toast("Export queued (demo).");
+      });
+
+      // pricing choose
+      $$("[data-plan]").forEach(btn => btn.addEventListener("click", () => {
+        toast(`Plan selected: ${btn.getAttribute("data-plan")} (placeholder).`);
+        openLogin();
+      }));
     });
   </script>
 </body>
