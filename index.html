@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>EditForAll — Clip it. Ship it. Pop it.</title>
+  <title>EditForAll — Turn videos and live streams into clips fast</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Bangers&display=swap" rel="stylesheet">
@@ -114,11 +114,20 @@
       padding: .5rem .75rem;
       margin-bottom: .5rem;
     }
+
+    .hero-burst {
+      background:
+        radial-gradient(circle at top left, #FFDE59 0%, #FFDE59 18%, transparent 18%),
+        radial-gradient(circle at top right, #8C52FF 0%, #8C52FF 14%, transparent 14%),
+        radial-gradient(circle at bottom left, #00BF63 0%, #00BF63 14%, transparent 14%),
+        radial-gradient(circle at bottom right, #FF914D 0%, #FF914D 16%, transparent 16%),
+        #fff;
+    }
   </style>
 </head>
 
 <body class="p-4 md:p-8">
-  <header class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-6 mb-12">
+  <header class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-6 mb-8">
     <div class="flex items-center gap-4">
       <div class="neo-card bg-brand-yellow p-3 rotate-[-3deg]">
         <span class="heading-font text-4xl">EFA</span>
@@ -137,20 +146,119 @@
     </div>
   </header>
 
+  <!-- HERO -->
+  <section class="max-w-7xl mx-auto mb-10">
+    <div class="neo-card hero-burst p-6 md:p-8">
+      <div class="grid lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7">
+          <div class="inline-block neo-card bg-brand-pink px-3 py-1 text-xs font-black rotate-[-2deg] mb-4">
+            FOR STREAMERS • CREATORS • PODCASTERS • SHORT-FORM CONTENT
+          </div>
+
+          <h2 class="heading-font text-5xl md:text-7xl leading-none">
+            TURN LONG VIDEOS<br>
+            INTO CLIPS FAST
+          </h2>
+
+          <p class="mt-4 text-lg md:text-xl font-bold max-w-2xl">
+            Paste a <span class="underline">live stream URL</span>, paste a <span class="underline">video link</span>, or <span class="underline">upload a file</span>.
+            Then tell EditForAll what kind of edit you want — and generate short clips for posting.
+          </p>
+
+          <div class="mt-6 grid sm:grid-cols-3 gap-3">
+            <div class="neo-card bg-brand-yellow p-4">
+              <div class="font-black text-xl">1. PASTE A LIVE URL</div>
+              <div class="mt-2 text-sm font-bold">Monitor live streams and hunt for moments while the stream is still running.</div>
+            </div>
+            <div class="neo-card bg-brand-cyan p-4">
+              <div class="font-black text-xl">2. PASTE A VIDEO LINK</div>
+              <div class="mt-2 text-sm font-bold">Drop in a YouTube or video URL and get an edit plan and clip ideas.</div>
+            </div>
+            <div class="neo-card bg-brand-purple text-white p-4">
+              <div class="font-black text-xl">3. UPLOAD A VIDEO</div>
+              <div class="mt-2 text-sm font-bold">Drag and drop a file to generate clips from recorded content.</div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button id="btnJumpLive" class="neo-btn bg-brand-cyan px-6 py-3">Start With Live URL</button>
+            <button id="btnJumpUpload" class="neo-btn bg-white px-6 py-3">Upload A Video</button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="neo-card bg-white p-5 rotate-[1deg]">
+            <div class="font-black text-sm mb-2">HOW IT WORKS</div>
+            <div class="space-y-3 text-sm font-bold">
+              <div class="neo-card bg-brand-yellow p-3">
+                PASTE A LINK OR UPLOAD A FILE
+              </div>
+              <div class="neo-card bg-brand-pink p-3">
+                TELL THE AI WHAT KIND OF CLIPS YOU WANT
+              </div>
+              <div class="neo-card bg-brand-cyan p-3">
+                GENERATE, REVIEW, AND POST YOUR CLIPS
+              </div>
+            </div>
+
+            <div class="mt-4 border-4 border-black p-4 bg-gray-50">
+              <div class="font-black text-sm">EXAMPLE PROMPTS</div>
+              <ul class="mt-2 space-y-2 text-sm font-bold">
+                <li>• 5 clips evenly spread out</li>
+                <li>• Funny moments only</li>
+                <li>• High energy hooks with captions</li>
+                <li>• Best podcast clips for social media</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU CAN DO -->
+  <section class="max-w-7xl mx-auto mb-10">
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="neo-card bg-white p-5">
+        <div class="heading-font text-3xl">LIVE STREAMS</div>
+        <p class="mt-2 font-bold text-gray-700">
+          Paste a live stream URL and let EditForAll monitor the stream for viral moments, reactions, wins, and highlights.
+        </p>
+      </div>
+      <div class="neo-card bg-white p-5">
+        <div class="heading-font text-3xl">VIDEO LINKS</div>
+        <p class="mt-2 font-bold text-gray-700">
+          Paste a video link and use AI prompts to shape the type of edit you want before creating clips.
+        </p>
+      </div>
+      <div class="neo-card bg-white p-5">
+        <div class="heading-font text-3xl">UPLOADED FILES</div>
+        <p class="mt-2 font-bold text-gray-700">
+          Upload a recorded video, generate multiple short clips, then select which ones you want to post.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <main class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10">
     <div class="lg:col-span-7 space-y-10">
       <div class="flex flex-wrap gap-3">
-        <button class="tab-btn active neo-btn bg-white px-4 py-2 text-sm" data-tab="liveTab">Live URL</button>
+        <button class="tab-btn active neo-btn bg-white px-4 py-2 text-sm" data-tab="liveTab">Live URL / Video Link</button>
         <button class="tab-btn neo-btn bg-white px-4 py-2 text-sm" data-tab="connectTab">Connect</button>
         <button class="tab-btn neo-btn bg-white px-4 py-2 text-sm" data-tab="uploadTab">Upload</button>
       </div>
 
       <section id="liveTab" class="tab-panel neo-card p-8 bg-white relative">
-        <h2 class="heading-font text-4xl mb-4 italic">1. Monitor Live</h2>
-        <p class="font-bold text-gray-600 mb-6">Paste a link and we'll hunt for viral clips in real-time.</p>
+        <h2 class="heading-font text-4xl mb-2 italic">1. Paste A Link</h2>
+        <p class="font-bold text-gray-600 mb-2">
+          Paste a live stream URL <span class="underline">or</span> a regular video link.
+        </p>
+        <p class="font-bold text-gray-500 mb-6">
+          Use this for Kick, Twitch, YouTube, recorded videos, podcast links, or other video URLs you want to turn into clips.
+        </p>
 
         <div class="space-y-6">
-          <input id="liveUrlInput" type="url" placeholder="https://kick.com/your-name" class="neo-input w-full text-lg">
+          <input id="liveUrlInput" type="url" placeholder="https://kick.com/your-name OR https://youtube.com/watch?v=..." class="neo-input w-full text-lg">
 
           <div class="grid sm:grid-cols-2 gap-4">
             <select id="liveCadence" class="neo-input w-full bg-white appearance-none cursor-pointer">
@@ -158,7 +266,7 @@
               <option value="quick">Turbo (More Clips)</option>
               <option value="precision">Deep Scan (High Virality)</option>
             </select>
-            <input id="liveInstruction" type="text" placeholder="e.g. 'Funny moments only'" class="neo-input w-full">
+            <input id="liveInstruction" type="text" placeholder="e.g. 'Funny moments only' or '5 clips evenly spread out'" class="neo-input w-full">
           </div>
 
           <div class="flex gap-4">
@@ -180,7 +288,9 @@
 
       <section id="connectTab" class="tab-panel neo-card p-8 bg-white hidden">
         <h2 class="heading-font text-4xl mb-4">Link Accounts</h2>
-        <p class="font-bold text-gray-600 mb-6">This version stores connection state locally. Real OAuth requires a backend.</p>
+        <p class="font-bold text-gray-600 mb-6">
+          Connect your platforms so EditForAll knows where you want your clips to go.
+        </p>
 
         <div class="grid sm:grid-cols-3 gap-4">
           <div id="platformCard-youtube" class="neo-card p-4 bg-red-100 flex flex-col items-center">
@@ -223,7 +333,11 @@
       </section>
 
       <section id="uploadTab" class="tab-panel neo-card p-8 bg-white hidden">
-        <h2 class="heading-font text-4xl mb-4 italic">File Drop</h2>
+        <h2 class="heading-font text-4xl mb-2 italic">File Upload</h2>
+        <p class="font-bold text-gray-600 mb-6">
+          Drag and drop a recorded video here to generate short clips from an uploaded file.
+        </p>
+
         <div id="dropzone" class="dropzone border-4 border-dashed border-black p-12 text-center bg-gray-50 cursor-pointer transition">
           <p class="font-black text-2xl">SMASH YOUR VIDEO HERE</p>
           <p class="font-bold text-gray-500">OR CLICK TO BROWSE</p>
@@ -248,6 +362,10 @@
           <h2 class="heading-font text-3xl">AI COMMANDER</h2>
           <button id="btnUseExample" class="neo-btn bg-white text-xs px-3 py-1">Example</button>
         </div>
+
+        <p class="font-bold mb-4">
+          Tell the AI what kind of edit you want and it will shape the clip strategy.
+        </p>
 
         <div id="chatLog" class="bg-white border-4 border-black p-4 mb-4 h-40 overflow-y-auto font-bold text-sm"></div>
 
@@ -321,7 +439,7 @@
 
   <script>
     const STORAGE_KEYS = {
-      state: 'efa_state_v1'
+      state: 'efa_state_v2'
     };
 
     const DEFAULT_STATE = {
@@ -544,7 +662,7 @@
             const generated = {
               ...clip,
               id: generateClipId(),
-              sourceType: 'live',
+              sourceType: 'link',
               sourceUrl: url
             };
             appState.clips.push(generated);
@@ -903,11 +1021,10 @@
       }
 
       if (!els.chatLog.children.length) {
-        addChatMessage('AI', 'Paste a live URL, connect a platform, or upload a video — then tell me what clips to find.', 'ai');
+        addChatMessage('AI', 'Paste a live URL, paste a video link, or upload a video — then tell me what clips to find.', 'ai');
       }
     }
 
-    // Events
     initTabs();
     initUploadZone();
     hydrateUI();
@@ -962,6 +1079,18 @@
     document.getElementById('btnDoLogin').onclick = doLogin;
     document.getElementById('btnUseDummy').onclick = fillDummyLogin;
     document.getElementById('btnLogout').onclick = logout;
+
+    document.getElementById('btnJumpLive').onclick = () => {
+      document.getElementById('liveTab').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    document.getElementById('btnJumpUpload').onclick = () => {
+      els.tabs.forEach(t => t.classList.remove('active'));
+      els.panels.forEach(p => p.classList.add('hidden'));
+      document.querySelector('[data-tab="uploadTab"]').classList.add('active');
+      document.getElementById('uploadTab').classList.remove('hidden');
+      document.getElementById('uploadTab').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
   </script>
 </body>
 </html>
