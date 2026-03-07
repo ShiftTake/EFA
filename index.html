@@ -4,24 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>EditForAll — Edit simply for all platforms</title>
-  <meta name="description" content="Copy a link, paste it, upload (or import). Tell EditForAll what you want: “5 clips, evenly spread out.” We handle captions, reframing, and exports." />
+  <meta
+    name="description"
+    content="Copy. Paste. Upload. Or connect an account. EditForAll helps you clip streams and videos fast with AI-assisted editing prompts."
+  />
   <meta name="theme-color" content="#070b14" />
-  <script src="https://cdn.tailwindcss.com"></script>
 
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          boxShadow: { soft: "0 18px 55px rgba(0,0,0,.35)" },
+          boxShadow: {
+            soft: "0 18px 55px rgba(0,0,0,.35)",
+            neon: "0 0 0 1px rgba(255,255,255,.06), 0 25px 80px rgba(0,0,0,.50)"
+          },
           keyframes: {
-            floaty: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-6px)" } },
-            glow: { "0%,100%": { opacity: .5 }, "50%": { opacity: 1 } },
-            shimmer: { "0%": { backgroundPosition: "0% 50%" }, "100%": { backgroundPosition: "100% 50%" } }
+            floaty: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-8px)" } },
+            glow: { "0%,100%": { opacity: .55 }, "50%": { opacity: 1 } },
+            sweep: { "0%": { backgroundPosition: "0% 50%" }, "100%": { backgroundPosition: "100% 50%" } },
+            pulseRing: { "0%,100%": { transform: "scale(1)", opacity: .75 }, "50%": { transform: "scale(1.03)", opacity: 1 } }
           },
           animation: {
-            floaty: "floaty 6s ease-in-out infinite",
+            floaty: "floaty 7s ease-in-out infinite",
             glow: "glow 3s ease-in-out infinite",
-            shimmer: "shimmer 6s linear infinite"
+            sweep: "sweep 7s linear infinite",
+            pulseRing: "pulseRing 3.2s ease-in-out infinite"
           }
         }
       }
@@ -36,14 +44,20 @@
     :root { color-scheme: dark; }
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
 
-    /* --- Background image (YOU will add this file to repo) --- */
-    /* Put your image here: /assets/baby-editing-phone.jpg (or update path below) */
-    .hero-bg {
+    :root{
+      --yt: 255,0,0;
+      --kick: 0,255,120;
+      --twitch: 145,70,255;
+      --cyan: 0,210,255;
+    }
+
+    .bg-photo{
       background:
-        radial-gradient(circle at 12% 18%, rgba(255, 0, 0, .18) 0%, transparent 34%),    /* YouTube-ish red */
-        radial-gradient(circle at 88% 18%, rgba(0, 255, 0, .10) 0%, transparent 28%),     /* Kick-ish green */
-        radial-gradient(circle at 55% 92%, rgba(145, 70, 255, .14) 0%, transparent 38%),  /* Twitch-ish purple */
-        linear-gradient(180deg, rgba(7,11,20,.82) 0%, rgba(7,11,20,.92) 65%, rgba(6,9,19,1) 100%),
+        radial-gradient(circle at 10% 12%, rgba(var(--yt), .18) 0%, transparent 38%),
+        radial-gradient(circle at 90% 18%, rgba(var(--kick), .14) 0%, transparent 40%),
+        radial-gradient(circle at 55% 92%, rgba(var(--twitch), .18) 0%, transparent 42%),
+        radial-gradient(circle at 22% 85%, rgba(var(--cyan), .14) 0%, transparent 42%),
+        linear-gradient(180deg, rgba(7,11,20,.35) 0%, rgba(7,11,20,.82) 55%, rgba(6,9,19,1) 100%),
         url("assets/baby-editing-phone.jpg");
       background-size: cover;
       background-position: center;
@@ -52,195 +66,221 @@
 
     .gridfx{
       background-image:
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 42px 42px;
       background-position: center;
-      mask-image: radial-gradient(circle at 40% 30%, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+      mask-image: radial-gradient(circle at 40% 25%, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 72%);
     }
 
     .glass {
-      background: rgba(15,23,42,.58);
-      border: 1px solid rgba(148,163,184,.14);
-      backdrop-filter: blur(10px);
+      background: rgba(9, 14, 27, .64);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
     }
 
-    .btn { transition: transform .08s ease, filter .15s ease; }
-    .btn:active { transform: translateY(1px); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-
-    .brand-gradient {
+    .platform-stripe {
       background: linear-gradient(90deg,
-        rgba(255,0,0,.85),      /* YouTube red */
-        rgba(0,255,0,.55),      /* Kick green */
-        rgba(145,70,255,.75),   /* Twitch purple */
-        rgba(0,208,255,.70)     /* extra cyan pop */
+        rgba(var(--yt), .95),
+        rgba(var(--kick), .85),
+        rgba(var(--twitch), .90),
+        rgba(var(--cyan), .85),
+        rgba(var(--yt), .95)
       );
       background-size: 300% 300%;
     }
 
-    .platform-dot {
-      width: 10px; height: 10px; border-radius: 999px;
-      box-shadow: 0 0 0 6px rgba(255,255,255,.03);
+    .platform-text {
+      background: linear-gradient(90deg,
+        rgba(var(--yt), 1),
+        rgba(var(--kick), 1),
+        rgba(var(--twitch), 1),
+        rgba(var(--cyan), 1)
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .platform-ring { position: relative; }
+    .platform-ring::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(90deg,
+        rgba(var(--yt), .75),
+        rgba(var(--kick), .70),
+        rgba(var(--twitch), .75),
+        rgba(var(--cyan), .70)
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: .95;
+      pointer-events: none;
+      filter: drop-shadow(0 0 18px rgba(var(--twitch), .18));
+    }
+
+    .chip {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+    }
+
+    .btn { transition: transform .08s ease, filter .15s ease; }
+    .btn:active { transform: translateY(1px); }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 999px; }
+    .dot.yt { background: rgba(var(--yt), .95); box-shadow: 0 0 22px rgba(var(--yt), .25); }
+    .dot.k { background: rgba(var(--kick), .85); box-shadow: 0 0 22px rgba(var(--kick), .22); }
+    .dot.t { background: rgba(var(--twitch), .90); box-shadow: 0 0 22px rgba(var(--twitch), .22); }
+    .dot.c { background: rgba(var(--cyan), .85); box-shadow: 0 0 22px rgba(var(--cyan), .22); }
+
+    .mode-tab.active {
+      background: rgba(255,255,255,.95);
+      color: #0b1020;
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .dropzone.dragover {
+      border-color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.06);
+      transform: scale(1.01);
+    }
+
+    .hidden-mode { display: none; }
+
+    .bubble {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+    }
+    .bubble-user {
+      background: rgba(255,255,255,.95);
+      color: #0b1020;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .status-pill {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
     }
   </style>
 </head>
 
-<body class="h-full text-slate-100 hero-bg">
-  <!-- subtle grid overlay -->
-  <div class="pointer-events-none fixed inset-0 gridfx opacity-[.35]"></div>
+<body class="h-full text-slate-100 bg-photo">
+  <div class="pointer-events-none fixed inset-0 gridfx opacity-[.36]"></div>
+  <div class="fixed top-0 left-0 right-0 h-[3px] z-50 platform-stripe animate-sweep"></div>
 
-  <!-- NAV -->
-  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#070b14]/55 backdrop-blur">
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#060913]/55 backdrop-blur">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center justify-between">
       <a href="#" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl brand-gradient shadow-soft flex items-center justify-center font-black text-black animate-shimmer">
+        <div class="h-10 w-10 rounded-xl platform-stripe animate-sweep shadow-soft flex items-center justify-center font-black text-black">
           ea
         </div>
         <div class="leading-tight">
           <div class="font-extrabold tracking-tight text-lg">EditForAll</div>
-          <div class="text-xs text-slate-300/80 -mt-0.5">edit simply for all platforms</div>
+          <div class="text-xs text-slate-300/85 -mt-0.5">edit simply for all platforms</div>
         </div>
       </a>
 
       <nav class="hidden md:flex items-center gap-8 text-sm text-slate-200/90">
-        <a class="hover:text-white" href="#how">How it works</a>
-        <a class="hover:text-white" href="#features">Features</a>
+        <a class="hover:text-white" href="#workflow">Workflow</a>
         <a class="hover:text-white" href="#assistant">Assistant</a>
+        <a class="hover:text-white" href="#backend">Make it real</a>
       </nav>
 
       <div class="flex items-center gap-3">
-        <button id="btnLogin" class="btn hidden sm:inline-flex rounded-xl px-4 py-2 text-sm font-semibold border border-white/15 hover:border-white/25 glass">
+        <button id="btnLogin" class="btn hidden sm:inline-flex rounded-xl px-4 py-2 text-sm font-semibold glass hover:brightness-110">
           Log in
         </button>
         <button id="btnPrimaryCta" class="btn inline-flex rounded-xl px-4 py-2 text-sm font-black bg-white text-black hover:brightness-95">
-          Make clips
+          Start editing
         </button>
       </div>
     </div>
   </header>
 
-  <!-- HERO -->
   <main>
     <section class="relative">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-14 pb-10">
         <div class="grid lg:grid-cols-12 gap-10 items-center">
-          <!-- left -->
           <div class="lg:col-span-7">
-            <div class="inline-flex items-center gap-3 rounded-full px-3 py-1 text-xs glass">
+            <div class="inline-flex items-center gap-3 rounded-full px-3 py-1 text-xs glass shadow-soft">
               <span class="h-2 w-2 rounded-full bg-emerald-400 animate-glow"></span>
-              <span><b>Freemium</b> workflow • start in seconds • upgrade later if you want</span>
+              <span><b>Freemium</b> — clip now, scale later.</span>
             </div>
 
-            <h1 class="mt-5 text-4xl sm:text-5xl font-black tracking-tight leading-[1.05]">
-              Edit simply for
-              <span class="bg-gradient-to-r from-red-200 via-emerald-200 to-purple-200 bg-clip-text text-transparent">
-                all platforms
-              </span>.
+            <h1 class="mt-6 text-4xl sm:text-6xl font-black tracking-tight leading-[1.02]">
+              Copy. Paste. Upload.
+              <span class="platform-text">Or connect and automate.</span>
             </h1>
 
-            <p class="mt-4 text-lg text-slate-200/85 leading-relaxed">
-              Copy a link. Paste it. Upload (or import). Then <b>just tell us what you want</b> —
-              like <span class="mono">“5 clips, evenly spread out”</span>.
+            <p class="mt-4 text-lg text-slate-200/85 leading-relaxed max-w-2xl">
+              Edit live streams while they are still running, auto-publish from connected accounts,
+              or drag and drop a video and tell the editor exactly what to do.
             </p>
 
-            <!-- platform color cues (no logos) -->
-            <div class="mt-4 flex flex-wrap gap-2 text-xs text-slate-200/85">
-              <span class="glass rounded-full px-3 py-1 flex items-center gap-2">
-                <span class="platform-dot" style="background: rgba(255,0,0,.85)"></span>
-                YouTube-style edits
-              </span>
-              <span class="glass rounded-full px-3 py-1 flex items-center gap-2">
-                <span class="platform-dot" style="background: rgba(0,255,0,.55)"></span>
-                Kick-style highlights
-              </span>
-              <span class="glass rounded-full px-3 py-1 flex items-center gap-2">
-                <span class="platform-dot" style="background: rgba(145,70,255,.75)"></span>
-                Twitch-style clips
-              </span>
-              <span class="glass rounded-full px-3 py-1 flex items-center gap-2">
-                <span class="platform-dot" style="background: rgba(0,208,255,.70)"></span>
-                Shorts / Reels / TikTok
-              </span>
-            </div>
-
-            <!-- BIG 1/2/3 branding -->
-            <div class="mt-7 grid sm:grid-cols-3 gap-3">
-              <div class="glass rounded-2xl p-4 relative overflow-hidden">
-                <div class="absolute -top-12 -right-12 h-28 w-28 rounded-full bg-red-500/15 blur-2xl"></div>
-                <div class="text-5xl font-black leading-none">1</div>
-                <div class="mt-2 text-base font-extrabold">Copy</div>
-                <div class="mt-1 text-sm text-slate-200/75">Grab a link or select a file.</div>
+            <div class="mt-6 grid sm:grid-cols-3 gap-3" id="workflow">
+              <div class="platform-ring glass rounded-2xl p-5 shadow-neon">
+                <div class="text-6xl font-black leading-none">1</div>
+                <div class="mt-2 text-lg font-extrabold">Paste live URL</div>
+                <div class="mt-1 text-sm text-slate-200/75">Clip while the stream is in progress.</div>
               </div>
-              <div class="glass rounded-2xl p-4 relative overflow-hidden">
-                <div class="absolute -top-12 -right-12 h-28 w-28 rounded-full bg-emerald-400/12 blur-2xl"></div>
-                <div class="text-5xl font-black leading-none">2</div>
-                <div class="mt-2 text-base font-extrabold">Paste</div>
-                <div class="mt-1 text-sm text-slate-200/75">Drop it in — no downloads.</div>
+              <div class="platform-ring glass rounded-2xl p-5 shadow-neon">
+                <div class="text-6xl font-black leading-none">2</div>
+                <div class="mt-2 text-lg font-extrabold">Connect account</div>
+                <div class="mt-1 text-sm text-slate-200/75">Auto-import and auto-publish clips.</div>
               </div>
-              <div class="glass rounded-2xl p-4 relative overflow-hidden">
-                <div class="absolute -top-12 -right-12 h-28 w-28 rounded-full bg-purple-500/14 blur-2xl"></div>
-                <div class="text-5xl font-black leading-none">3</div>
-                <div class="mt-2 text-base font-extrabold">Upload</div>
-                <div class="mt-1 text-sm text-slate-200/75">Export and post anywhere.</div>
+              <div class="platform-ring glass rounded-2xl p-5 shadow-neon">
+                <div class="text-6xl font-black leading-none">3</div>
+                <div class="mt-2 text-lg font-extrabold">Drag & drop</div>
+                <div class="mt-1 text-sm text-slate-200/75">Upload any video and start editing fast.</div>
               </div>
             </div>
 
-            <!-- single action input -->
-            <div class="mt-6 glass rounded-2xl p-4">
-              <label class="text-xs text-slate-300">Paste video link (YouTube / Drive for now)</label>
-              <div class="mt-2 flex flex-col sm:flex-row gap-2">
-                <input id="linkInput" type="url"
-                  class="w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60"
-                  placeholder="https://youtube.com/watch?v=...  or  https://drive.google.com/file/d/..."
-                  value="https://youtube.com/watch?v=dQw4w9WgXcQ"
-                />
-                <button id="btnGetClips" class="btn rounded-xl px-5 py-3 text-sm font-black bg-white text-black hover:brightness-95">
-                  Generate
-                </button>
-              </div>
-
-              <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-300/90">
-                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Auto captions</span>
-                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Hook moments</span>
-                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">Auto 9:16 reframe</span>
-                <span class="rounded-full px-3 py-1 border border-white/10 bg-black/20">1-click export (demo)</span>
-              </div>
-            </div>
-
-            <div class="mt-5 text-sm text-slate-300/80">
-              Demo UI with dummy data • Firebase-ready • Swap in real processing later
+            <div class="mt-6 flex flex-wrap gap-2 text-xs text-slate-300/90">
+              <span class="chip rounded-full px-3 py-1">Live clipping</span>
+              <span class="chip rounded-full px-3 py-1">Account connections</span>
+              <span class="chip rounded-full px-3 py-1">Prompt-based editing</span>
+              <span class="chip rounded-full px-3 py-1">Auto captions</span>
+              <span class="chip rounded-full px-3 py-1">Auto 9:16 reframe</span>
             </div>
           </div>
 
-          <!-- right: preview -->
           <div class="lg:col-span-5">
-            <div class="glass rounded-3xl p-5 shadow-soft relative overflow-hidden">
-              <div class="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-red-500/10 blur-3xl"></div>
-              <div class="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-purple-500/12 blur-3xl"></div>
-
+            <div class="platform-ring glass rounded-3xl p-5 shadow-neon">
               <div class="flex items-center justify-between">
-                <div class="text-sm font-bold">Suggested clips</div>
-                <button id="btnOpenLogin" class="text-xs underline text-slate-300 hover:text-white">Log in</button>
-              </div>
-
-              <div id="clipList" class="mt-4 space-y-3"></div>
-
-              <div class="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
-                <div class="flex items-center justify-between">
-                  <div class="text-xs text-slate-400">Virality score</div>
-                  <div id="viralityPct" class="text-sm font-black">—</div>
-                </div>
-                <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div id="viralityBar" class="h-full w-[0%] brand-gradient animate-shimmer"></div>
-                </div>
-                <div class="mt-2 text-[11px] text-slate-400">
-                  Hook strength + pacing + energy (demo)
+                <div class="text-sm font-black">Platform-ready</div>
+                <div class="flex items-center gap-2">
+                  <span class="dot yt"></span>
+                  <span class="dot k"></span>
+                  <span class="dot t"></span>
+                  <span class="dot c"></span>
                 </div>
               </div>
 
-              <button id="btnExportDemo" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
-                Export (demo)
+              <div class="mt-4 grid gap-3">
+                <div class="rounded-2xl border border-white/10 bg-black/35 p-4">
+                  <div class="font-extrabold">Paste a live stream URL</div>
+                  <div class="mt-1 text-sm text-slate-300/80">Capture moments while the stream is still happening.</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/35 p-4">
+                  <div class="font-extrabold">Connect channels</div>
+                  <div class="mt-1 text-sm text-slate-300/80">Automatically upload clips to your account after approval.</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/35 p-4">
+                  <div class="font-extrabold">Upload files directly</div>
+                  <div class="mt-1 text-sm text-slate-300/80">Drag a file in and generate multiple clips in minutes.</div>
+                </div>
+              </div>
+
+              <button id="btnScrollToComposer" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+                Open clip composer
               </button>
             </div>
           </div>
@@ -248,144 +288,299 @@
       </div>
     </section>
 
-    <!-- HOW -->
-    <section id="how" class="py-12 border-t border-white/10 bg-[#070b14]/45">
+    <!-- COMPOSER -->
+    <section class="py-14 border-t border-white/10 bg-[#060913]/45">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 class="text-2xl sm:text-3xl font-black tracking-tight">How it works</h2>
-        <p class="mt-2 text-slate-200/75">Simple flow. Fast clips. Minimal friction.</p>
+        <div class="flex items-end justify-between gap-6 flex-wrap">
+          <div>
+            <h2 class="text-2xl sm:text-4xl font-black tracking-tight">Clip composer</h2>
+            <p class="mt-2 text-slate-200/80">Three ways to start: live URL, connected account, or drag-and-drop upload.</p>
+          </div>
+          <div class="text-xs text-slate-400">Frontend wired for real API endpoints</div>
+        </div>
 
-        <div class="mt-6 grid md:grid-cols-5 gap-3">
-          <div class="glass rounded-2xl p-4">
-            <div class="text-xs text-slate-400">01</div>
-            <div class="mt-1 font-extrabold">Copy</div>
+        <div class="mt-7 grid lg:grid-cols-12 gap-5 items-start">
+          <!-- left -->
+          <div class="lg:col-span-7">
+            <div class="platform-ring glass rounded-3xl p-5 shadow-neon" id="clipComposer">
+              <div class="flex flex-wrap gap-2">
+                <button class="mode-tab active rounded-xl px-4 py-2 text-sm font-black border border-white/10" data-mode="live">
+                  Live stream URL
+                </button>
+                <button class="mode-tab rounded-xl px-4 py-2 text-sm font-black border border-white/10" data-mode="connect">
+                  Connect account
+                </button>
+                <button class="mode-tab rounded-xl px-4 py-2 text-sm font-black border border-white/10" data-mode="upload">
+                  Drag & drop upload
+                </button>
+              </div>
+
+              <!-- LIVE -->
+              <div id="mode-live" class="mt-5">
+                <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  <div class="font-extrabold">Edit while the stream is still live</div>
+                  <div class="mt-1 text-sm text-slate-300/80">
+                    Paste a stream URL, choose the platform, and start a live clipping job.
+                  </div>
+
+                  <div class="mt-4 grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-xs text-slate-300">Platform</label>
+                      <select id="livePlatform" class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none">
+                        <option value="youtube">YouTube Live</option>
+                        <option value="twitch">Twitch</option>
+                        <option value="kick">Kick</option>
+                        <option value="other">Other / custom</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="text-xs text-slate-300">Clip count target</label>
+                      <select id="liveClipCount" class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none">
+                        <option>3</option>
+                        <option selected>5</option>
+                        <option>8</option>
+                        <option>10</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="text-xs text-slate-300">Live stream URL</label>
+                    <input
+                      id="liveUrlInput"
+                      type="url"
+                      class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none"
+                      placeholder="https://www.youtube.com/watch?v=... or stream URL"
+                    />
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="text-xs text-slate-300">Editing prompt</label>
+                    <textarea
+                      id="livePrompt"
+                      rows="3"
+                      class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none resize-none"
+                      placeholder='Example: "5 clips, evenly spread out. Prioritize funny moments. Add bold captions."'
+                    >5 clips, evenly spread out. Prioritize high-energy moments.</textarea>
+                  </div>
+
+                  <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                    <button id="btnStartLiveJob" class="btn rounded-xl px-5 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+                      Start live clipping
+                    </button>
+                    <button id="btnPollLiveJob" class="btn rounded-xl px-5 py-3 text-sm font-black border border-white/10 glass hover:brightness-110">
+                      Check job status
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CONNECT -->
+              <div id="mode-connect" class="mt-5 hidden-mode">
+                <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  <div class="font-extrabold">Connect an account and automate uploads</div>
+                  <div class="mt-1 text-sm text-slate-300/80">
+                    Let users authorize your app, import content, and auto-publish approved clips.
+                  </div>
+
+                  <div class="mt-4 grid sm:grid-cols-3 gap-3">
+                    <button class="btn connect-btn rounded-2xl border border-white/10 bg-black/35 p-4 text-left hover:border-white/20" data-provider="youtube">
+                      <div class="flex items-center gap-2">
+                        <span class="dot yt"></span>
+                        <div class="font-extrabold">Connect YouTube</div>
+                      </div>
+                      <div class="mt-1 text-xs text-slate-400">OAuth + upload flow</div>
+                    </button>
+
+                    <button class="btn connect-btn rounded-2xl border border-white/10 bg-black/35 p-4 text-left hover:border-white/20" data-provider="twitch">
+                      <div class="flex items-center gap-2">
+                        <span class="dot t"></span>
+                        <div class="font-extrabold">Connect Twitch</div>
+                      </div>
+                      <div class="mt-1 text-xs text-slate-400">OAuth + clip tools</div>
+                    </button>
+
+                    <button class="btn connect-btn rounded-2xl border border-white/10 bg-black/35 p-4 text-left hover:border-white/20" data-provider="kick">
+                      <div class="flex items-center gap-2">
+                        <span class="dot k"></span>
+                        <div class="font-extrabold">Connect Kick</div>
+                      </div>
+                      <div class="mt-1 text-xs text-slate-400">Developer integration</div>
+                    </button>
+                  </div>
+
+                  <div class="mt-4 grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-xs text-slate-300">Auto action after clip is approved</label>
+                      <select id="autoAction" class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none">
+                        <option value="draft">Save as draft</option>
+                        <option value="upload" selected>Upload automatically</option>
+                        <option value="queue">Queue for review</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="text-xs text-slate-300">Connected account status</label>
+                      <div id="connectedStatus" class="mt-2 rounded-xl status-pill px-4 py-3 text-sm text-slate-300">
+                        No account connected yet.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <button id="btnRefreshConnections" class="btn rounded-xl px-5 py-3 text-sm font-black border border-white/10 glass hover:brightness-110">
+                      Refresh connection status
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- UPLOAD -->
+              <div id="mode-upload" class="mt-5 hidden-mode">
+                <div class="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  <div class="font-extrabold">Drag and drop a video</div>
+                  <div class="mt-1 text-sm text-slate-300/80">
+                    Upload a file directly and let EditForAll turn it into short clips.
+                  </div>
+
+                  <div
+                    id="dropzone"
+                    class="dropzone mt-4 rounded-2xl border-2 border-dashed border-white/15 bg-black/25 p-8 text-center transition"
+                  >
+                    <div class="text-lg font-extrabold">Drop video here</div>
+                    <div class="mt-1 text-sm text-slate-300/75">or click to choose a file</div>
+                    <div class="mt-3 text-xs text-slate-400">Recommended: mp4, mov, webm</div>
+                    <input id="fileInput" type="file" accept="video/*" class="hidden" />
+                  </div>
+
+                  <div id="selectedFileWrap" class="mt-4 hidden">
+                    <div class="rounded-xl status-pill px-4 py-3 text-sm">
+                      Selected file: <span id="selectedFileName" class="font-semibold"></span>
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="text-xs text-slate-300">Editing prompt</label>
+                    <textarea
+                      id="uploadPrompt"
+                      rows="3"
+                      class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none resize-none"
+                      placeholder='Example: "Create 6 clips. Keep the strongest hooks. Add dynamic captions."'
+                    >Create 5 clips. Keep the strongest hooks. Add bold captions.</textarea>
+                  </div>
+
+                  <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                    <button id="btnUploadVideo" class="btn rounded-xl px-5 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+                      Upload and process
+                    </button>
+                    <button id="btnClearFile" class="btn rounded-xl px-5 py-3 text-sm font-black border border-white/10 glass hover:brightness-110">
+                      Clear file
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="glass rounded-2xl p-4">
-            <div class="text-xs text-slate-400">02</div>
-            <div class="mt-1 font-extrabold">Paste</div>
-          </div>
-          <div class="glass rounded-2xl p-4">
-            <div class="text-xs text-slate-400">03</div>
-            <div class="mt-1 font-extrabold">Generate</div>
-          </div>
-          <div class="glass rounded-2xl p-4">
-            <div class="text-xs text-slate-400">04</div>
-            <div class="mt-1 font-extrabold">Tell us what to do</div>
-          </div>
-          <div class="glass rounded-2xl p-4">
-            <div class="text-xs text-slate-400">05</div>
-            <div class="mt-1 font-extrabold">Export</div>
+
+          <!-- right -->
+          <div class="lg:col-span-5">
+            <div class="platform-ring glass rounded-3xl p-5 shadow-neon">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-black">Job status</div>
+                <div id="jobStatusBadge" class="text-xs rounded-full px-3 py-1 border border-white/10 bg-black/25">Idle</div>
+              </div>
+
+              <div class="mt-4 rounded-2xl border border-white/10 bg-black/35 p-4">
+                <div class="text-xs text-slate-400">Current job</div>
+                <div id="jobSummary" class="mt-2 text-sm text-slate-200/90">
+                  No job started yet.
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl border border-white/10 bg-black/35 p-4">
+                <div class="flex items-center justify-between">
+                  <div class="text-xs text-slate-400">Progress</div>
+                  <div id="progressPct" class="text-sm font-black">0%</div>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div id="progressBar" class="h-full w-[0%] platform-stripe animate-sweep"></div>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl border border-white/10 bg-black/35 p-4">
+                <div class="text-xs text-slate-400">Last API response</div>
+                <pre id="apiResponse" class="mt-2 text-xs text-slate-300 whitespace-pre-wrap break-words">No response yet.</pre>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- FEATURES -->
-    <section id="features" class="py-12 border-t border-white/10">
+    <!-- ASSISTANT -->
+    <section id="assistant" class="py-14 border-t border-white/10">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <div class="flex items-end justify-between gap-6 flex-wrap">
           <div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Must-have features</h2>
-            <p class="mt-2 text-slate-200/75">The non-negotiables users pay for — but we keep it chill.</p>
-          </div>
-          <div class="text-xs text-slate-400">Phase 1 focus for MVP</div>
-        </div>
-
-        <div class="mt-6 grid md:grid-cols-2 gap-4">
-          <div class="glass rounded-2xl p-5">
-            <div class="font-extrabold">Link-to-Clip Processing</div>
-            <div class="mt-1 text-sm text-slate-200/75">Start from a link (YouTube + Google Drive now).</div>
-          </div>
-          <div class="glass rounded-2xl p-5">
-            <div class="font-extrabold">Transcription + Captions</div>
-            <div class="mt-1 text-sm text-slate-200/75">Clean captions and styles (demo scaffolding).</div>
-          </div>
-          <div class="glass rounded-2xl p-5">
-            <div class="font-extrabold">Moment Detection</div>
-            <div class="mt-1 text-sm text-slate-200/75">Hook / energy / laughter spikes (demo scoring).</div>
-          </div>
-          <div class="glass rounded-2xl p-5">
-            <div class="font-extrabold">Auto Reframe</div>
-            <div class="mt-1 text-sm text-slate-200/75">Face-centric 9:16 crops + punchy layouts.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ASSISTANT (CHATGPT-LIKE) -->
-    <section id="assistant" class="py-12 border-t border-white/10 bg-[#070b14]/45">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="flex items-end justify-between gap-6 flex-wrap">
-          <div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Talk to your editor</h2>
-            <p class="mt-2 text-slate-200/75">
-              Type what you want, like <span class="mono">“5 clips, evenly spread out”</span> or
-              <span class="mono">“caption style: bold, large, center”</span>.
+            <h2 class="text-2xl sm:text-4xl font-black tracking-tight">
+              Talk to your editor like <span class="platform-text">ChatGPT</span>
+            </h2>
+            <p class="mt-2 text-slate-200/80">
+              Example: <span class="mono">“5 clips, evenly spread out. Prioritize laughs. Add bold captions.”</span>
             </p>
           </div>
           <button id="btnUseExample" class="btn rounded-xl px-4 py-2 text-sm font-black bg-white text-black hover:brightness-95">
-            Use example prompt
+            Use example
           </button>
         </div>
 
-        <div class="mt-6 grid lg:grid-cols-12 gap-4 items-start">
-          <!-- Chat -->
+        <div class="mt-7 grid lg:grid-cols-12 gap-4 items-start">
           <div class="lg:col-span-7">
-            <div class="glass rounded-3xl border border-white/10 overflow-hidden">
+            <div class="platform-ring glass rounded-3xl border border-white/10 overflow-hidden shadow-neon">
               <div class="p-4 border-b border-white/10 flex items-center justify-between">
-                <div class="font-extrabold">EditForAll Assistant (demo)</div>
+                <div class="font-extrabold">EditForAll Assistant</div>
                 <div class="text-xs text-slate-400">Natural language → edit plan</div>
               </div>
 
-              <div id="chatLog" class="p-4 space-y-3 max-h-[360px] overflow-auto">
-                <!-- messages injected -->
-              </div>
+              <div id="chatLog" class="p-4 space-y-3 max-h-[360px] overflow-auto"></div>
 
               <div class="p-4 border-t border-white/10">
-                <label class="text-xs text-slate-300">Tell us what to edit</label>
+                <label class="text-xs text-slate-300">What should we edit?</label>
                 <div class="mt-2 flex flex-col sm:flex-row gap-2">
-                  <input id="chatInput" type="text"
-                    class="w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60"
-                    placeholder='e.g., "5 clips, evenly spread out. Add captions. Keep it high energy."'
+                  <input
+                    id="chatInput"
+                    type="text"
+                    class="w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60"
+                    placeholder='e.g., "5 clips, evenly spread out. Keep only high-energy moments."'
                   />
-                  <button id="btnSendChat" class="btn rounded-xl px-5 py-3 text-sm font-black bg-gradient-to-r from-red-400 via-emerald-300 to-purple-400 text-black hover:brightness-95">
+                  <button id="btnSendChat" class="btn rounded-xl px-5 py-3 text-sm font-black platform-stripe animate-sweep text-black hover:brightness-95">
                     Send
                   </button>
-                </div>
-                <div class="mt-2 text-xs text-slate-400">
-                  Demo only: This simulates how the assistant will behave (wire up to your real backend later).
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Suggested prompt chips + output -->
           <div class="lg:col-span-5">
-            <div class="glass rounded-3xl p-5 border border-white/10">
-              <div class="font-extrabold">Try prompts</div>
-              <div class="mt-3 flex flex-wrap gap-2 text-xs">
-                <button class="promptChip rounded-full px-3 py-1 border border-white/10 bg-black/25 hover:border-white/20" data-prompt="5 clips, evenly spread out. Keep only high-energy moments.">
+            <div class="platform-ring glass rounded-3xl p-5 border border-white/10 shadow-neon">
+              <div class="font-extrabold">Assistant output</div>
+              <div id="assistantOutput" class="mt-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-sm text-slate-100/90 leading-relaxed">
+                Send a prompt to generate an edit plan.
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                <button class="promptChip chip rounded-full px-3 py-1 hover:border-white/20" data-prompt="5 clips, evenly spread out. Keep only high-energy moments.">
                   5 evenly spaced
                 </button>
-                <button class="promptChip rounded-full px-3 py-1 border border-white/10 bg-black/25 hover:border-white/20" data-prompt="3 clips from the best hooks. Add bold captions.">
+                <button class="promptChip chip rounded-full px-3 py-1 hover:border-white/20" data-prompt="3 clips from the best hooks. Add bold captions.">
                   best hooks
                 </button>
-                <button class="promptChip rounded-full px-3 py-1 border border-white/10 bg-black/25 hover:border-white/20" data-prompt="Make it more funny: prioritize laughter moments, quick cuts.">
+                <button class="promptChip chip rounded-full px-3 py-1 hover:border-white/20" data-prompt="Make it more funny: prioritize laughter moments, quick cuts.">
                   prioritize laughs
                 </button>
-                <button class="promptChip rounded-full px-3 py-1 border border-white/10 bg-black/25 hover:border-white/20" data-prompt="Make 1 teaser + 4 clips. Keep a consistent caption style.">
-                  teaser + 4
-                </button>
               </div>
 
-              <div class="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
-                <div class="text-xs text-slate-400">Assistant output (demo)</div>
-                <div id="assistantOutput" class="mt-2 text-sm text-slate-100/90 leading-relaxed">
-                  Send a prompt to see the plan here.
-                </div>
-              </div>
-
-              <button id="btnApplyPlan" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
-                Apply plan (demo)
+              <button id="btnApplyAssistantPlan" class="btn mt-4 w-full rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
+                Apply prompt to current form
               </button>
             </div>
           </div>
@@ -393,14 +588,46 @@
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-white/10 py-10">
+    <!-- BACKEND CHECKLIST -->
+    <section id="backend" class="py-14 border-t border-white/10 bg-[#060913]/45">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 class="text-2xl sm:text-4xl font-black tracking-tight">What you need to make this real</h2>
+        <div class="mt-6 grid md:grid-cols-2 gap-4">
+          <div class="platform-ring glass rounded-2xl p-6 shadow-neon">
+            <div class="font-extrabold">Live stream clipping backend</div>
+            <div class="mt-2 text-sm text-slate-200/80">
+              Server-side ingestion, segment capture, transcription, scene detection, and clip rendering.
+            </div>
+          </div>
+          <div class="platform-ring glass rounded-2xl p-6 shadow-neon">
+            <div class="font-extrabold">OAuth + upload pipeline</div>
+            <div class="mt-2 text-sm text-slate-200/80">
+              Platform auth, token storage, upload permissions, and post-publish status tracking.
+            </div>
+          </div>
+          <div class="platform-ring glass rounded-2xl p-6 shadow-neon">
+            <div class="font-extrabold">Storage + job queue</div>
+            <div class="mt-2 text-sm text-slate-200/80">
+              Durable uploads, clip assets, worker queue, retries, and audit logs.
+            </div>
+          </div>
+          <div class="platform-ring glass rounded-2xl p-6 shadow-neon">
+            <div class="font-extrabold">Prompt-to-edit orchestration</div>
+            <div class="mt-2 text-sm text-slate-200/80">
+              Parse user prompts into clip count, spacing, style, captions, and publish actions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-10 bg-[#060913]/55">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="text-sm text-slate-400">© <span id="year"></span> EditForAll</div>
         <div class="text-sm text-slate-300/90 flex flex-wrap gap-5">
-          <a href="#how" class="hover:text-white">How</a>
-          <a href="#features" class="hover:text-white">Features</a>
+          <a href="#workflow" class="hover:text-white">Workflow</a>
           <a href="#assistant" class="hover:text-white">Assistant</a>
+          <a href="#backend" class="hover:text-white">Make it real</a>
           <a href="#" id="btnFooterLogin" class="hover:text-white">Log in</a>
         </div>
       </div>
@@ -411,45 +638,44 @@
   <div id="loginModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="w-full max-w-lg glass rounded-3xl border border-white/10 shadow-soft overflow-hidden">
+      <div class="platform-ring w-full max-w-lg glass rounded-3xl border border-white/10 shadow-neon overflow-hidden">
         <div class="p-5 border-b border-white/10 flex items-center justify-between">
           <div>
             <div class="text-lg font-black">Log in</div>
             <div class="text-xs text-slate-400">Demo auth now • Firebase Auth later</div>
           </div>
-          <button id="btnCloseLogin" class="rounded-xl px-3 py-2 text-sm border border-white/10 hover:border-white/20">
+          <button id="btnCloseLogin" class="rounded-xl px-3 py-2 text-sm glass hover:brightness-110">
             Close
           </button>
         </div>
 
         <div class="p-6">
-          <div class="rounded-2xl bg-black/25 border border-white/10 p-4 text-sm">
+          <div class="rounded-2xl bg-black/35 border border-white/10 p-4 text-sm">
             <div class="font-bold">Dummy test credentials</div>
             <div class="mt-2 grid sm:grid-cols-2 gap-3">
-              <div class="rounded-xl bg-black/25 border border-white/10 p-3">
+              <div class="rounded-xl bg-black/35 border border-white/10 p-3">
                 <div class="text-xs text-slate-400">Email</div>
-                <div class="mono font-semibold" id="dummyEmail">test@editforall.com</div>
+                <div class="mono font-semibold">test@editforall.com</div>
               </div>
-              <div class="rounded-xl bg-black/25 border border-white/10 p-3">
+              <div class="rounded-xl bg-black/35 border border-white/10 p-3">
                 <div class="text-xs text-slate-400">Password</div>
-                <div class="mono font-semibold" id="dummyPass">Password123!</div>
+                <div class="mono font-semibold">Password123!</div>
               </div>
             </div>
-            <div class="mt-2 text-xs text-slate-400">Click “Use dummy” to auto-fill.</div>
           </div>
 
           <div class="mt-5 grid gap-3">
             <div>
               <label class="text-xs text-slate-300">Email</label>
-              <input id="loginEmail" class="mt-2 w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60" placeholder="you@company.com" />
+              <input id="loginEmail" class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none" placeholder="you@company.com" />
             </div>
             <div>
               <label class="text-xs text-slate-300">Password</label>
-              <input id="loginPassword" type="password" class="mt-2 w-full rounded-xl bg-black/35 border border-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500/60" placeholder="••••••••" />
+              <input id="loginPassword" type="password" class="mt-2 w-full rounded-xl bg-black/45 border border-white/10 px-4 py-3 text-sm outline-none" placeholder="••••••••" />
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">
-              <button id="btnUseDummy" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-black border border-white/15 hover:border-white/25">
+              <button id="btnUseDummy" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-black glass hover:brightness-110">
                 Use dummy
               </button>
               <button id="btnDoLogin" class="btn flex-1 rounded-xl px-4 py-3 text-sm font-black bg-white text-black hover:brightness-95">
@@ -458,17 +684,12 @@
             </div>
 
             <div id="loginMsg" class="text-sm text-slate-300/90"></div>
-
-            <div class="mt-1 text-xs text-slate-400">
-              Firebase later: swap <span class="mono">fakeAuthSignIn()</span> with <span class="mono">signInWithEmailAndPassword()</span>.
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TOAST -->
   <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden">
     <div class="glass rounded-2xl border border-white/10 px-4 py-3 text-sm shadow-soft">
       <span id="toastText">Saved</span>
@@ -476,9 +697,6 @@
   </div>
 
   <script>
-    /***********************
-     * Firebase placeholders
-     ***********************/
     const FIREBASE_CONFIG = {
       apiKey: "DUMMY_API_KEY",
       authDomain: "editforall-dev.firebaseapp.com",
@@ -488,9 +706,6 @@
       appId: "1:000000000000:web:0000000000000000"
     };
 
-    /***********************
-     * Dummy demo auth
-     ***********************/
     const DUMMY_USER = {
       email: "test@editforall.com",
       password: "Password123!",
@@ -498,26 +713,19 @@
       plan: "freemium"
     };
 
-    async function fakeAuthSignIn(email, password){
-      await new Promise(r => setTimeout(r, 400));
-      if(email === DUMMY_USER.email && password === DUMMY_USER.password){
-        return { user: { uid: DUMMY_USER.uid, email: DUMMY_USER.email }, plan: DUMMY_USER.plan };
-      }
-      throw new Error("Invalid email or password.");
-    }
+    const API = {
+      liveStart: "/api/live/start",
+      liveStatus: "/api/live/status",
+      uploadVideo: "/api/upload/video",
+      oauthStart: "/api/oauth/start",
+      connectionsStatus: "/api/oauth/status",
+      assistantPlan: "/api/assistant/plan"
+    };
 
-    /***********************
-     * Dummy clip suggestions
-     ***********************/
-    const DUMMY_CLIPS = [
-      { id: "c1", title: "Hook moment: “Most people miss this…”", start: "00:12", dur: "0:18", score: 84, tags: ["hook", "energy"] },
-      { id: "c2", title: "Laughter spike + punchline", start: "02:40", dur: "0:22", score: 78, tags: ["laughter", "pacing+"] },
-      { id: "c3", title: "Clear step-by-step segment", start: "07:05", dur: "0:30", score: 71, tags: ["value", "clear"] }
-    ];
+    let currentJob = null;
+    let selectedFile = null;
+    let currentAssistantPrompt = "";
 
-    /***********************
-     * Helpers
-     ***********************/
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => Array.from(document.querySelectorAll(s));
 
@@ -525,70 +733,47 @@
       $("#toastText").textContent = msg;
       $("#toast").classList.remove("hidden");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => $("#toast").classList.add("hidden"), 2000);
+      window.__toastTimer = setTimeout(() => $("#toast").classList.add("hidden"), 2200);
     }
 
     function openLogin(){
       $("#loginModal").classList.remove("hidden");
-      setTimeout(() => $("#loginEmail").focus(), 50);
     }
     function closeLogin(){
       $("#loginModal").classList.add("hidden");
       $("#loginMsg").textContent = "";
     }
 
-    function setVirality(pct){
-      const p = Math.max(0, Math.min(100, pct));
-      $("#viralityPct").textContent = p;
-      $("#viralityBar").style.width = p + "%";
+    async function fakeAuthSignIn(email, password){
+      await new Promise(r => setTimeout(r, 300));
+      if(email === DUMMY_USER.email && password === DUMMY_USER.password){
+        return { user: { uid: DUMMY_USER.uid, email: DUMMY_USER.email }, plan: DUMMY_USER.plan };
+      }
+      throw new Error("Invalid email or password.");
     }
 
-    function renderClips(){
-      const wrap = $("#clipList");
-      wrap.innerHTML = "";
+    function setProgress(percent){
+      const p = Math.max(0, Math.min(100, Number(percent) || 0));
+      $("#progressPct").textContent = `${p}%`;
+      $("#progressBar").style.width = `${p}%`;
+    }
 
-      DUMMY_CLIPS.forEach((c, i) => {
-        const b = document.createElement("button");
-        b.className = "w-full text-left rounded-2xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition";
-        b.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <div class="text-sm font-extrabold">${c.title}</div>
-              <div class="mt-1 text-xs text-slate-400">${c.start} • ${c.dur} • ${c.tags.join(" · ")}</div>
-            </div>
-            <div class="text-right">
-              <div class="text-xs text-slate-400">Score</div>
-              <div class="text-lg font-black">${c.score}</div>
-            </div>
-          </div>
-        `;
-        b.addEventListener("click", () => {
-          setVirality(c.score);
-          toast(`Selected: ${c.start} (${c.score})`);
-        });
-        wrap.appendChild(b);
+    function setJobStatus(status, summary){
+      $("#jobStatusBadge").textContent = status;
+      $("#jobSummary").textContent = summary || "No summary available.";
+    }
 
-        if(i === 0) setVirality(c.score);
+    function setApiResponse(obj){
+      $("#apiResponse").textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    function switchMode(mode){
+      $$(".mode-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      ["live","connect","upload"].forEach(m => {
+        const el = document.getElementById(`mode-${m}`);
+        if(!el) return;
+        el.classList.toggle("hidden-mode", m !== mode);
       });
-    }
-
-    /***********************
-     * Assistant (demo) — chat-like UX
-     ***********************/
-    function addChatMessage(role, text){
-      const wrap = $("#chatLog");
-      const row = document.createElement("div");
-      const isUser = role === "user";
-
-      row.className = "flex " + (isUser ? "justify-end" : "justify-start");
-      row.innerHTML = `
-        <div class="${isUser ? "bg-white text-black" : "glass text-slate-100"} rounded-2xl px-4 py-3 max-w-[90%] border ${isUser ? "border-white/10" : "border-white/10"}">
-          <div class="text-[11px] ${isUser ? "text-black/60" : "text-slate-300/80"} mb-1">${isUser ? "You" : "EditForAll"}</div>
-          <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
-        </div>
-      `;
-      wrap.appendChild(row);
-      wrap.scrollTop = wrap.scrollHeight;
     }
 
     function escapeHtml(str){
@@ -600,149 +785,381 @@
         .replaceAll("'", "&#039;");
     }
 
-    function buildDemoPlanFromPrompt(prompt){
-      // very lightweight heuristic parser for the demo
+    function addChatMessage(role, text){
+      const wrap = $("#chatLog");
+      const row = document.createElement("div");
+      const isUser = role === "user";
+      row.className = "flex " + (isUser ? "justify-end" : "justify-start");
+      row.innerHTML = `
+        <div class="${isUser ? "bubble-user" : "bubble"} rounded-2xl px-4 py-3 max-w-[92%]">
+          <div class="text-[11px] ${isUser ? "text-black/60" : "text-slate-300/80"} mb-1">${isUser ? "You" : "EditForAll"}</div>
+          <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
+        </div>
+      `;
+      wrap.appendChild(row);
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function buildLocalPlan(prompt){
       const p = prompt.toLowerCase();
       let clips = 5;
       const m = p.match(/(\d+)\s*clips?/);
       if(m) clips = Math.max(1, Math.min(25, parseInt(m[1], 10)));
 
-      const evenly = /evenly|even|spread out|distributed/.test(p);
+      const evenly = /evenly|spread out|distributed/.test(p);
       const laughter = /laugh|funny|comedy/.test(p);
-      const hooks = /hook|best parts|viral/.test(p);
       const captions = /caption|subtitles/.test(p);
-
-      const bullets = [];
-      bullets.push(`• Create <b>${clips}</b> clips${evenly ? " (evenly spread across the full video)" : ""}.`);
-      bullets.push(`• Rank moments by <b>energy</b>${laughter ? " + <b>laughter spikes</b>" : ""}${hooks ? " + <b>hook strength</b>" : ""}.`);
-      bullets.push(`• Apply <b>auto 9:16 reframe</b> (face-centric when possible).`);
-      bullets.push(`• ${captions ? "Add" : "Optionally add"} <b>dynamic captions</b> with a consistent style.`);
-      bullets.push(`• Export <b>1080×1920</b> and keep intros tight (0–1s).`);
+      const hooks = /hook|viral|best parts/.test(p);
 
       return `
-        <div class="font-extrabold mb-1">Proposed edit plan</div>
-        <div class="text-sm text-slate-100/90 space-y-1">${bullets.map(b => `<div>${b}</div>`).join("")}</div>
-        <div class="mt-3 text-xs text-slate-300/80">Demo note: this is simulated logic. Replace with your real assistant + job queue.</div>
+        <div class="font-extrabold mb-2">Proposed edit plan</div>
+        <div>• Create <b>${clips}</b> clips${evenly ? " evenly spread across the source" : ""}.</div>
+        <div>• Prioritize <b>${laughter ? "funny / laughter moments" : "high-energy moments"}</b>.</div>
+        <div>• ${hooks ? "Boost hook-heavy openings." : "Keep strong openings."}</div>
+        <div>• ${captions ? "Add" : "Optional"} <b>dynamic captions</b>.</div>
+        <div>• Export vertical <b>1080×1920</b>.</div>
       `;
     }
 
-    /***********************
-     * Events
-     ***********************/
+    async function postJSON(url, body){
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = { ok: false, message: "Non-JSON response from server." };
+      }
+
+      if(!res.ok){
+        throw new Error(data?.message || `Request failed (${res.status})`);
+      }
+      return data;
+    }
+
+    async function getJSON(url){
+      const res = await fetch(url);
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = { ok: false, message: "Non-JSON response from server." };
+      }
+      if(!res.ok){
+        throw new Error(data?.message || `Request failed (${res.status})`);
+      }
+      return data;
+    }
+
+    async function startLiveJob(){
+      const platform = $("#livePlatform").value;
+      const url = $("#liveUrlInput").value.trim();
+      const clipCount = Number($("#liveClipCount").value || 5);
+      const prompt = $("#livePrompt").value.trim();
+
+      if(!url){
+        toast("Paste a live stream URL first.");
+        return;
+      }
+
+      setJobStatus("Submitting", "Creating live clipping job...");
+      setProgress(10);
+
+      try {
+        const payload = { platform, url, clipCount, prompt };
+        const data = await postJSON(API.liveStart, payload);
+        currentJob = data.jobId || data.id || "demo-live-job";
+        setJobStatus("Running", `Live clipping job started for ${platform}. Job ID: ${currentJob}`);
+        setProgress(25);
+        setApiResponse(data);
+        toast("Live clipping job started.");
+      } catch (err) {
+        setJobStatus("Demo mode", "Backend endpoint not connected yet. Using frontend demo state.");
+        setProgress(20);
+        setApiResponse({
+          demo: true,
+          endpoint: API.liveStart,
+          requested: { platform, url, clipCount, prompt }
+        });
+        currentJob = "demo-live-job";
+        toast("No backend yet — demo job created in UI.");
+      }
+    }
+
+    async function pollLiveJob(){
+      if(!currentJob){
+        toast("Start a live job first.");
+        return;
+      }
+
+      try {
+        const data = await getJSON(`${API.liveStatus}?jobId=${encodeURIComponent(currentJob)}`);
+        const progress = data.progress ?? 65;
+        setProgress(progress);
+        setJobStatus(data.status || "Running", data.summary || "Job in progress.");
+        setApiResponse(data);
+        toast("Job status refreshed.");
+      } catch (err) {
+        const fakeProgress = Math.min(100, (parseInt($("#progressPct").textContent, 10) || 20) + 20);
+        setProgress(fakeProgress);
+        setJobStatus(fakeProgress >= 100 ? "Completed" : "Running", fakeProgress >= 100 ? "Demo live job completed." : "Demo live job progressing...");
+        setApiResponse({
+          demo: true,
+          endpoint: API.liveStatus,
+          jobId: currentJob,
+          status: fakeProgress >= 100 ? "completed" : "running",
+          progress: fakeProgress
+        });
+        toast("Demo status updated.");
+      }
+    }
+
+    async function startOAuth(provider){
+      try {
+        const redirect = `${API.oauthStart}?provider=${encodeURIComponent(provider)}`;
+        window.location.href = redirect;
+      } catch (err) {
+        setApiResponse({
+          demo: true,
+          provider,
+          endpoint: API.oauthStart,
+          note: "Implement backend OAuth redirect endpoint."
+        });
+        $("#connectedStatus").textContent = `Demo only: ${provider} OAuth not wired yet.`;
+        toast(`Wire up ${provider} OAuth on the backend.`);
+      }
+    }
+
+    async function refreshConnections(){
+      try {
+        const data = await getJSON(API.connectionsStatus);
+        $("#connectedStatus").textContent = data.summary || "Connections loaded.";
+        setApiResponse(data);
+        toast("Connections refreshed.");
+      } catch (err) {
+        $("#connectedStatus").textContent = "Demo only: no backend connection status endpoint yet.";
+        setApiResponse({
+          demo: true,
+          endpoint: API.connectionsStatus,
+          connected: []
+        });
+        toast("No connection backend yet.");
+      }
+    }
+
+    async function uploadSelectedVideo(){
+      if(!selectedFile){
+        toast("Choose or drop a video first.");
+        return;
+      }
+
+      const prompt = $("#uploadPrompt").value.trim();
+      const formData = new FormData();
+      formData.append("video", selectedFile);
+      formData.append("prompt", prompt);
+
+      setJobStatus("Uploading", `Uploading ${selectedFile.name}...`);
+      setProgress(15);
+
+      try {
+        const res = await fetch(API.uploadVideo, {
+          method: "POST",
+          body: formData
+        });
+
+        let data = null;
+        try {
+          data = await res.json();
+        } catch {
+          data = { ok: false, message: "Non-JSON response from server." };
+        }
+
+        if(!res.ok){
+          throw new Error(data?.message || "Upload failed.");
+        }
+
+        currentJob = data.jobId || data.id || "upload-job";
+        setProgress(40);
+        setJobStatus("Processing", `Upload complete. Processing started. Job ID: ${currentJob}`);
+        setApiResponse(data);
+        toast("Upload sent to backend.");
+      } catch (err) {
+        currentJob = "demo-upload-job";
+        setProgress(35);
+        setJobStatus("Demo mode", `Selected file "${selectedFile.name}" captured in UI.`);
+        setApiResponse({
+          demo: true,
+          endpoint: API.uploadVideo,
+          fileName: selectedFile.name,
+          size: selectedFile.size,
+          type: selectedFile.type,
+          prompt
+        });
+        toast("No upload backend yet — UI captured the file.");
+      }
+    }
+
+    function setSelectedFile(file){
+      selectedFile = file || null;
+      const wrap = $("#selectedFileWrap");
+      if(selectedFile){
+        wrap.classList.remove("hidden");
+        $("#selectedFileName").textContent = `${selectedFile.name} (${Math.round(selectedFile.size / 1024 / 1024 * 10) / 10} MB)`;
+      } else {
+        wrap.classList.add("hidden");
+        $("#selectedFileName").textContent = "";
+      }
+    }
+
+    function applyAssistantPromptToForms(prompt){
+      currentAssistantPrompt = prompt;
+      $("#livePrompt").value = prompt;
+      $("#uploadPrompt").value = prompt;
+      toast("Prompt applied to live + upload forms.");
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       $("#year").textContent = new Date().getFullYear();
-      renderClips();
 
-      // seed chat
-      addChatMessage("assistant", "Paste a link, then tell me what you want.\nExample: “5 clips, evenly spread out. Prioritize laughs. Add bold captions.”");
+      addChatMessage("assistant", "Paste a live URL, connect an account, or upload a file. Then tell me what kind of clips you want.");
 
-      // primary CTA mirrors the main button
-      $("#btnPrimaryCta").addEventListener("click", () => $("#btnGetClips").click());
+      $$(".mode-tab").forEach(btn => {
+        btn.addEventListener("click", () => switchMode(btn.dataset.mode));
+      });
 
-      // login opens
+      $("#btnPrimaryCta").addEventListener("click", () => {
+        document.getElementById("clipComposer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      $("#btnScrollToComposer").addEventListener("click", () => {
+        document.getElementById("clipComposer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
       $("#btnLogin").addEventListener("click", openLogin);
-      $("#btnOpenLogin").addEventListener("click", openLogin);
-      $("#btnFooterLogin").addEventListener("click", (e) => { e.preventDefault(); openLogin(); });
+      $("#btnFooterLogin").addEventListener("click", (e) => {
+        e.preventDefault();
+        openLogin();
+      });
 
-      // modal close
       $("#btnCloseLogin").addEventListener("click", closeLogin);
       $("#loginModal").addEventListener("click", (e) => {
         if(e.target === $("#loginModal").children[0]) closeLogin();
       });
-      window.addEventListener("keydown", (e) => {
-        if(e.key === "Escape" && !$("#loginModal").classList.contains("hidden")) closeLogin();
-      });
 
-      // dummy fill
       $("#btnUseDummy").addEventListener("click", () => {
         $("#loginEmail").value = DUMMY_USER.email;
         $("#loginPassword").value = DUMMY_USER.password;
         toast("Dummy credentials filled.");
       });
 
-      // do login (demo)
       $("#btnDoLogin").addEventListener("click", async () => {
         const email = $("#loginEmail").value.trim();
         const password = $("#loginPassword").value;
         $("#loginMsg").textContent = "Signing in…";
-        $("#loginMsg").className = "text-sm text-slate-300/90";
-
-        try{
-          const session = await fakeAuthSignIn(email, password);
-          window.__session = session;
+        try {
+          await fakeAuthSignIn(email, password);
           $("#loginMsg").textContent = "Success!";
-          $("#loginMsg").className = "text-sm text-emerald-300 font-semibold";
           closeLogin();
-          toast("Logged in (demo). Next: dashboard file.");
-        }catch(err){
+          toast("Logged in (demo).");
+        } catch (err) {
           $("#loginMsg").textContent = err.message || "Login failed.";
-          $("#loginMsg").className = "text-sm text-rose-300 font-semibold";
         }
       });
 
-      // get clips (demo)
-      $("#btnGetClips").addEventListener("click", () => {
-        const link = $("#linkInput").value.trim();
-        const ok = /youtube\.com|youtu\.be|drive\.google\.com/i.test(link);
-        if(!ok){
-          toast("Paste a YouTube or Google Drive link.");
-          return;
-        }
-        toast("Analyzing (demo)… clips ready.");
-        renderClips();
-        // nudge user to assistant
-        setTimeout(() => {
-          addChatMessage("assistant", "Clips are ready. Tell me how you want them edited.");
-          document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          setTimeout(() => $("#chatInput").focus(), 350);
-        }, 400);
+      $("#btnStartLiveJob").addEventListener("click", startLiveJob);
+      $("#btnPollLiveJob").addEventListener("click", pollLiveJob);
+
+      $$(".connect-btn").forEach(btn => {
+        btn.addEventListener("click", () => startOAuth(btn.dataset.provider));
+      });
+      $("#btnRefreshConnections").addEventListener("click", refreshConnections);
+
+      const dropzone = $("#dropzone");
+      const fileInput = $("#fileInput");
+
+      dropzone.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if(file) setSelectedFile(file);
       });
 
-      // export (demo)
-      $("#btnExportDemo").addEventListener("click", () => {
-        toast("Export queued (demo).");
+      ["dragenter", "dragover"].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add("dragover");
+        });
       });
 
-      // assistant prompt chips
-      $$(".promptChip").forEach(btn => btn.addEventListener("click", () => {
-        const p = btn.getAttribute("data-prompt") || "";
-        $("#chatInput").value = p;
-        $("#chatInput").focus();
-      }));
-
-      $("#btnUseExample").addEventListener("click", () => {
-        $("#chatInput").value = "5 clips, evenly spread out. Prioritize laughs. Add bold captions.";
-        $("#chatInput").focus();
+      ["dragleave", "drop"].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove("dragover");
+        });
       });
 
-      function sendChat(){
+      dropzone.addEventListener("drop", (e) => {
+        const file = e.dataTransfer?.files?.[0];
+        if(file) setSelectedFile(file);
+      });
+
+      $("#btnUploadVideo").addEventListener("click", uploadSelectedVideo);
+      $("#btnClearFile").addEventListener("click", () => {
+        fileInput.value = "";
+        setSelectedFile(null);
+        toast("File cleared.");
+      });
+
+      function sendAssistantPrompt(){
         const prompt = $("#chatInput").value.trim();
         if(!prompt) return;
 
         addChatMessage("user", prompt);
-
-        // simulate thinking
-        setTimeout(() => {
-          const planHtml = buildDemoPlanFromPrompt(prompt);
-          // assistant says short confirmation + shows plan
-          addChatMessage("assistant", "Got it — here’s a plan based on your prompt.");
-          $("#assistantOutput").innerHTML = planHtml;
-          toast("Assistant plan updated (demo).");
-        }, 350);
-
+        currentAssistantPrompt = prompt;
+        $("#assistantOutput").innerHTML = buildLocalPlan(prompt);
+        applyAssistantPromptToForms(prompt);
+        addChatMessage("assistant", "Got it — I translated that into an edit plan and applied it to your forms.");
         $("#chatInput").value = "";
       }
 
-      $("#btnSendChat").addEventListener("click", sendChat);
+      $("#btnSendChat").addEventListener("click", sendAssistantPrompt);
       $("#chatInput").addEventListener("keydown", (e) => {
         if(e.key === "Enter"){
           e.preventDefault();
-          sendChat();
+          sendAssistantPrompt();
         }
       });
 
-      $("#btnApplyPlan").addEventListener("click", () => {
-        toast("Applied plan (demo).");
+      $$(".promptChip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const prompt = btn.dataset.prompt || "";
+          $("#chatInput").value = prompt;
+          $("#assistantOutput").innerHTML = buildLocalPlan(prompt);
+          applyAssistantPromptToForms(prompt);
+          addChatMessage("user", prompt);
+          addChatMessage("assistant", "Applied that prompt to the current workflow.");
+        });
+      });
+
+      $("#btnUseExample").addEventListener("click", () => {
+        const prompt = "5 clips, evenly spread out. Prioritize laughs. Add bold captions.";
+        $("#chatInput").value = prompt;
+        $("#assistantOutput").innerHTML = buildLocalPlan(prompt);
+        applyAssistantPromptToForms(prompt);
+        addChatMessage("assistant", "Example prompt loaded.");
+      });
+
+      $("#btnApplyAssistantPlan").addEventListener("click", () => {
+        if(!currentAssistantPrompt){
+          toast("Create a prompt first.");
+          return;
+        }
+        applyAssistantPromptToForms(currentAssistantPrompt);
       });
     });
   </script>
