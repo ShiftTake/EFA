@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<title>About EditForAll</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Bangers&display=swap" rel="stylesheet">
+
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors:{
+brand:{
+yellow:'#FFDE59',
+pink:'#FF914D',
+purple:'#8C52FF',
+cyan:'#00BF63'
+}
+},
+boxShadow:{
+neo:'6px 6px 0 #000'
+}
+}
+}
+}
+</script>
+
+<style>
+
+body{
+font-family:'Space Grotesk',sans-serif;
+background-color:#f3f4f6;
+background-image: radial-gradient(#000000 1px, transparent 1px);
+background-size:30px 30px;
+}
+
+.heading-font{
+font-family:'Bangers',cursive;
+letter-spacing:.05em;
+}
+
+.neo-card{
+background:white;
+border:4px solid black;
+box-shadow:8px 8px 0 black;
+}
+
+.neo-btn{
+border:3px solid black;
+box-shadow:4px 4px 0 black;
+font-weight:800;
+text-transform:uppercase;
+}
+
+.neo-btn:hover{
+transform:translate(-2px,-2px);
+box-shadow:6px 6px 0 black;
+}
+
+</style>
+</head>
+
+<body class="p-6">
+
+<div class="max-w-7xl mx-auto">
+
+<!-- HEADER -->
+
+<header class="flex justify-between items-center mb-12">
+
+<div class="flex items-center gap-4">
+
+<div class="neo-card bg-brand-yellow p-3 rotate-[-3deg]">
+<span class="heading-font text-4xl">EFA</span>
+</div>
+
+<div>
+<h1 class="heading-font text-5xl">EditForAll</h1>
+<p class="font-bold text-sm bg-brand-cyan px-2 border-2 border-black inline-block mt-1 uppercase">
+Simple editing for every platform
+</p>
+</div>
+
+</div>
+
+<div class="flex gap-3">
+<a href="index.html" class="neo-btn bg-white px-5 py-2">Home</a>
+<a href="dashboard.html" class="neo-btn bg-brand-purple text-white px-5 py-2">Dashboard</a>
+</div>
+
+</header>
+
+<!-- HERO -->
+
+<section class="neo-card p-10 mb-12">
+
+<h2 class="heading-font text-6xl mb-4">
+ABOUT EDITFORALL
+</h2>
+
+<p class="text-xl font-bold max-w-3xl">
+EditForAll is a platform designed to help creators turn long videos and livestreams
+into short viral clips — automatically.
+</p>
+
+<p class="mt-4 text-lg max-w-3xl font-bold text-gray-700">
+Instead of manually editing hours of footage, creators can paste a link,
+upload a video, or monitor a live stream and instantly generate
+high-quality clips ready for social media.
+</p>
+
+</section>
+
+<!-- WHAT WE DO -->
+
+<section class="grid md:grid-cols-3 gap-6 mb-12">
+
+<div class="neo-card p-6 bg-brand-yellow">
+<h3 class="heading-font text-3xl">PASTE A LINK</h3>
+<p class="mt-2 font-bold">
+Paste a YouTube video, Kick stream, Twitch VOD, or any video URL and let EditForAll
+automatically find the best moments.
+</p>
+</div>
+
+<div class="neo-card p-6 bg-brand-cyan">
+<h3 class="heading-font text-3xl">UPLOAD VIDEO</h3>
+<p class="mt-2 font-bold">
+Drag and drop a video file and instantly generate multiple short clips
+for TikTok, YouTube Shorts, or Instagram.
+</p>
+</div>
+
+<div class="neo-card p-6 bg-brand-purple text-white">
+<h3 class="heading-font text-3xl">LIVE STREAM MONITORING</h3>
+<p class="mt-2 font-bold">
+Monitor a livestream while it's happening and automatically detect
+high-energy or viral moments.
+</p>
+</div>
+
+</section>
+
+<!-- HOW IT WORKS -->
+
+<section class="neo-card p-10 mb-12">
+
+<h3 class="heading-font text-5xl mb-8">HOW IT WORKS</h3>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+<div class="neo-card p-6 bg-white">
+<h4 class="heading-font text-3xl">1. COPY</h4>
+<p class="font-bold mt-2">
+Paste a livestream URL, paste a video link, or upload a file.
+</p>
+</div>
+
+<div class="neo-card p-6 bg-white">
+<h4 class="heading-font text-3xl">2. AI EDIT</h4>
+<p class="font-bold mt-2">
+Tell the AI what clips you want and it generates highlights automatically.
+</p>
+</div>
+
+<div class="neo-card p-6 bg-white">
+<h4 class="heading-font text-3xl">3. POST</h4>
+<p class="font-bold mt-2">
+Export or automatically post clips to social media platforms.
+</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- WHO IT IS FOR -->
+
+<section class="grid md:grid-cols-2 gap-8 mb-12">
+
+<div class="neo-card p-8">
+
+<h3 class="heading-font text-4xl mb-4">
+WHO IT'S FOR
+</h3>
+
+<ul class="font-bold space-y-2">
+
+<li>• Streamers</li>
+<li>• YouTubers</li>
+<li>• TikTok creators</li>
+<li>• Podcasters</li>
+<li>• Content agencies</li>
+<li>• Social media teams</li>
+
+</ul>
+
+</div>
+
+<div class="neo-card p-8">
+
+<h3 class="heading-font text-4xl mb-4">
+WHY WE BUILT IT
+</h3>
+
+<p class="font-bold">
+Creators spend hours editing content just to make a few clips.
+EditForAll was built to automate that process so creators can focus on
+creating instead of editing.
+</p>
+
+</div>
+
+</section>
+
+<!-- CTA -->
+
+<section class="neo-card p-10 text-center bg-brand-pink">
+
+<h3 class="heading-font text-5xl mb-4">
+START CLIPPING
+</h3>
+
+<p class="font-bold mb-6">
+Turn your long content into viral clips faster.
+</p>
+
+<a href="index.html" class="neo-btn bg-white px-8 py-3 text-lg">
+START FREE
+</a>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer class="mt-12 text-center text-sm font-bold text-gray-600">
+
+<p>© 2026 EditForAll</p>
+
+<div class="flex justify-center gap-6 mt-2">
+
+<a href="about.html">About</a>
+<a href="#">Privacy</a>
+<a href="#">Terms</a>
+
+</div>
+
+</footer>
+
+</div>
+
+</body>
+</html>
