@@ -123,6 +123,12 @@
         radial-gradient(circle at bottom right, #FF914D 0%, #FF914D 16%, transparent 16%),
         #fff;
     }
+
+    .auth-toggle.active {
+      background: #FFDE59;
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0px 0px #000;
+    }
   </style>
 </head>
 
@@ -142,11 +148,10 @@
       <div id="userPill" class="hidden neo-card bg-white px-4 py-2 text-sm font-bold"></div>
       <button id="btnLogin" class="neo-btn bg-white px-6 py-2">Log In</button>
       <button id="btnLogout" class="neo-btn bg-brand-yellow px-6 py-2 hidden">Log Out</button>
-      <button class="neo-btn bg-brand-purple text-white px-6 py-2">Get Pro</button>
+      <button id="btnStartFree" class="neo-btn bg-brand-purple text-white px-6 py-2">Start Free</button>
     </div>
   </header>
 
-  <!-- HERO -->
   <section class="max-w-7xl mx-auto mb-10">
     <div class="neo-card hero-burst p-6 md:p-8">
       <div class="grid lg:grid-cols-12 gap-8 items-center">
@@ -183,6 +188,7 @@
           <div class="mt-6 flex flex-wrap gap-3">
             <button id="btnJumpLive" class="neo-btn bg-brand-cyan px-6 py-3">Start With Live URL</button>
             <button id="btnJumpUpload" class="neo-btn bg-white px-6 py-3">Upload A Video</button>
+            <button id="btnHeroStartFree" class="neo-btn bg-brand-purple text-white px-6 py-3">Start Free</button>
           </div>
         </div>
 
@@ -216,7 +222,6 @@
     </div>
   </section>
 
-  <!-- WHAT YOU CAN DO -->
   <section class="max-w-7xl mx-auto mb-10">
     <div class="grid md:grid-cols-3 gap-4">
       <div class="neo-card bg-white p-5">
@@ -415,18 +420,47 @@
   </main>
 
   <div id="loginModal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center p-4">
-    <div class="neo-card w-full max-w-md p-8 bg-white rotate-1">
-      <h2 class="heading-font text-4xl mb-6 text-center">LOGIN TO EFA</h2>
+    <div class="neo-card w-full max-w-lg p-8 bg-white rotate-1">
+      <div class="flex justify-between items-start gap-4 mb-6">
+        <div>
+          <h2 id="authTitle" class="heading-font text-4xl">LOGIN TO EFA</h2>
+          <p id="authSubtitle" class="font-bold text-sm text-gray-600 mt-1">Welcome back. Log in to keep editing.</p>
+        </div>
+        <button id="btnCloseLogin" class="neo-btn bg-white px-4 py-2">X</button>
+      </div>
+
+      <div class="flex gap-3 mb-6">
+        <button id="authModeLogin" class="auth-toggle active neo-btn bg-white flex-1 py-3">Log In</button>
+        <button id="authModeSignup" class="auth-toggle neo-btn bg-white flex-1 py-3">Sign Up</button>
+      </div>
+
       <div class="space-y-4">
+        <div id="signupNameWrap" class="hidden">
+          <input id="signupName" type="text" placeholder="Full name" class="neo-input w-full">
+        </div>
+
         <input id="loginEmail" type="email" placeholder="Email" class="neo-input w-full">
         <input id="loginPassword" type="password" placeholder="Password" class="neo-input w-full">
+
+        <div id="confirmPasswordWrap" class="hidden">
+          <input id="signupConfirmPassword" type="password" placeholder="Confirm password" class="neo-input w-full">
+        </div>
+
         <div class="flex gap-3">
           <button id="btnUseDummy" class="neo-btn bg-brand-yellow px-4">DUMMY</button>
-          <button id="btnDoLogin" class="neo-btn bg-brand-cyan flex-1 py-3">GO</button>
-          <button id="btnCloseLogin" class="neo-btn bg-white px-4">X</button>
+          <button id="btnDoAuth" class="neo-btn bg-brand-cyan flex-1 py-3">GO</button>
         </div>
-        <div class="text-xs font-bold text-gray-500">Demo: test@editforall.com / Password123!</div>
-        <div id="loginMsg" class="text-center font-bold text-red-500"></div>
+
+        <div class="text-xs font-bold text-gray-500" id="authHelpText">
+          Demo login: test@editforall.com / Password123!
+        </div>
+
+        <div class="text-center font-bold text-gray-700">
+          <span id="authSwitchText">New here?</span>
+          <button id="btnInlineAuthSwitch" class="underline font-black ml-1">Start free</button>
+        </div>
+
+        <div id="loginMsg" class="text-center font-bold text-red-500 min-h-[24px]"></div>
       </div>
     </div>
   </div>
@@ -439,13 +473,14 @@
 
   <script>
     const STORAGE_KEYS = {
-      state: 'efa_state_v2'
+      state: 'efa_state_v3'
     };
 
     const DEFAULT_STATE = {
       isLoggedIn: false,
       userEmail: '',
       strategy: '',
+      authMode: 'login',
       connections: {
         youtube: false,
         kick: false,
@@ -454,7 +489,14 @@
       autoUploadTarget: '',
       clips: [],
       selectedClipIds: [],
-      uploadFile: null
+      uploadFile: null,
+      users: [
+        {
+          name: 'Demo User',
+          email: 'test@editforall.com',
+          password: 'Password123!'
+        }
+      ]
     };
 
     let appState = loadState();
@@ -462,11 +504,6 @@
     let monitorProgress = 0;
     let monitorInterval = null;
     let pendingGeneratedClipIndexes = [];
-
-    const DUMMY_USER = {
-      email: 'test@editforall.com',
-      password: 'Password123!'
-    };
 
     const BASE_CLIPS = [
       { id: "c1", title: "EPIC WIN MOMENT", start: "00:12", score: 98, color: "#FFDE59", tags: ['hook', 'energy'] },
@@ -501,14 +538,38 @@
       selectedFileMeta: document.getElementById('selectedFileMeta'),
       userPill: document.getElementById('userPill'),
       btnLogin: document.getElementById('btnLogin'),
-      btnLogout: document.getElementById('btnLogout')
+      btnLogout: document.getElementById('btnLogout'),
+      btnStartFree: document.getElementById('btnStartFree'),
+      btnHeroStartFree: document.getElementById('btnHeroStartFree'),
+      authTitle: document.getElementById('authTitle'),
+      authSubtitle: document.getElementById('authSubtitle'),
+      authModeLogin: document.getElementById('authModeLogin'),
+      authModeSignup: document.getElementById('authModeSignup'),
+      signupNameWrap: document.getElementById('signupNameWrap'),
+      signupName: document.getElementById('signupName'),
+      loginEmail: document.getElementById('loginEmail'),
+      loginPassword: document.getElementById('loginPassword'),
+      confirmPasswordWrap: document.getElementById('confirmPasswordWrap'),
+      signupConfirmPassword: document.getElementById('signupConfirmPassword'),
+      btnUseDummy: document.getElementById('btnUseDummy'),
+      btnDoAuth: document.getElementById('btnDoAuth'),
+      authHelpText: document.getElementById('authHelpText'),
+      authSwitchText: document.getElementById('authSwitchText'),
+      btnInlineAuthSwitch: document.getElementById('btnInlineAuthSwitch'),
+      loginMsg: document.getElementById('loginMsg')
     };
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEYS.state);
         if (!raw) return structuredClone(DEFAULT_STATE);
-        return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(raw) };
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(DEFAULT_STATE),
+          ...parsed,
+          connections: { ...DEFAULT_STATE.connections, ...(parsed.connections || {}) },
+          users: Array.isArray(parsed.users) && parsed.users.length ? parsed.users : structuredClone(DEFAULT_STATE.users)
+        };
       } catch {
         return structuredClone(DEFAULT_STATE);
       }
@@ -549,11 +610,15 @@
         els.userPill.textContent = appState.userEmail;
         els.btnLogin.classList.add('hidden');
         els.btnLogout.classList.remove('hidden');
+        els.btnStartFree.textContent = 'Dashboard';
+        els.btnHeroStartFree.textContent = 'Dashboard';
       } else {
         els.userPill.classList.add('hidden');
         els.userPill.textContent = '';
         els.btnLogin.classList.remove('hidden');
         els.btnLogout.classList.add('hidden');
+        els.btnStartFree.textContent = 'Start Free';
+        els.btnHeroStartFree.textContent = 'Start Free';
       }
     }
 
@@ -927,28 +992,109 @@
       showToast('VAULT CLEARED');
     }
 
-    function doLogin() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const msg = document.getElementById('loginMsg');
+    function setAuthMode(mode) {
+      appState.authMode = mode;
+      saveState();
 
-      if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
+      const isSignup = mode === 'signup';
+
+      els.authModeLogin.classList.toggle('active', !isSignup);
+      els.authModeSignup.classList.toggle('active', isSignup);
+
+      els.signupNameWrap.classList.toggle('hidden', !isSignup);
+      els.confirmPasswordWrap.classList.toggle('hidden', !isSignup);
+
+      els.authTitle.textContent = isSignup ? 'START FREE' : 'LOGIN TO EFA';
+      els.authSubtitle.textContent = isSignup
+        ? 'Create your account and start clipping.'
+        : 'Welcome back. Log in to keep editing.';
+      els.btnDoAuth.textContent = isSignup ? 'CREATE ACCOUNT' : 'GO';
+      els.authHelpText.textContent = isSignup
+        ? 'Demo signup stores your new account in localStorage on this browser.'
+        : 'Demo login: test@editforall.com / Password123!';
+      els.authSwitchText.textContent = isSignup ? 'Already have an account?' : 'New here?';
+      els.btnInlineAuthSwitch.textContent = isSignup ? 'Log in' : 'Start free';
+      els.btnUseDummy.classList.toggle('hidden', isSignup);
+
+      els.loginMsg.textContent = '';
+    }
+
+    function openAuthModal(mode = 'login') {
+      setAuthMode(mode);
+      els.loginModal.classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      els.loginModal.classList.add('hidden');
+      els.loginMsg.textContent = '';
+    }
+
+    function doAuth() {
+      const mode = appState.authMode || 'login';
+      const email = els.loginEmail.value.trim().toLowerCase();
+      const password = els.loginPassword.value;
+      const name = els.signupName.value.trim();
+      const confirmPassword = els.signupConfirmPassword.value;
+
+      if (!email || !password) {
+        els.loginMsg.textContent = 'Please enter your email and password.';
+        return;
+      }
+
+      if (mode === 'login') {
+        const user = (appState.users || []).find(u => u.email.toLowerCase() === email && u.password === password);
+        if (!user) {
+          els.loginMsg.textContent = 'Invalid login credentials.';
+          return;
+        }
+
         appState.isLoggedIn = true;
-        appState.userEmail = email;
+        appState.userEmail = user.email;
         saveState();
         updateLoginUI();
-        els.loginModal.classList.add('hidden');
-        msg.textContent = '';
+        closeAuthModal();
         showToast('LOGIN SUCCESS');
-      } else {
-        msg.textContent = 'Invalid demo credentials.';
+        return;
       }
+
+      if (!name) {
+        els.loginMsg.textContent = 'Please enter your name.';
+        return;
+      }
+
+      if (password.length < 8) {
+        els.loginMsg.textContent = 'Password must be at least 8 characters.';
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        els.loginMsg.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      const existingUser = (appState.users || []).find(u => u.email.toLowerCase() === email);
+      if (existingUser) {
+        els.loginMsg.textContent = 'An account with that email already exists.';
+        return;
+      }
+
+      appState.users.push({
+        name,
+        email,
+        password
+      });
+      appState.isLoggedIn = true;
+      appState.userEmail = email;
+      saveState();
+      updateLoginUI();
+      closeAuthModal();
+      showToast('ACCOUNT CREATED');
     }
 
     function fillDummyLogin() {
-      document.getElementById('loginEmail').value = DUMMY_USER.email;
-      document.getElementById('loginPassword').value = DUMMY_USER.password;
-      document.getElementById('loginMsg').textContent = '';
+      els.loginEmail.value = 'test@editforall.com';
+      els.loginPassword.value = 'Password123!';
+      els.loginMsg.textContent = '';
       showToast('DUMMY FILLED');
     }
 
@@ -1013,6 +1159,7 @@
       updateStrategyUI();
       updateAutoUploadUI();
       renderClips();
+      setAuthMode(appState.authMode || 'login');
 
       if (appState.uploadFile) {
         els.uploadInfo.classList.remove('hidden');
@@ -1070,15 +1217,18 @@
     document.getElementById('btnExportDemo').onclick = postSelectedClips;
     document.getElementById('btnClearAllClips').onclick = clearAllClips;
 
-    document.getElementById('btnLogin').onclick = () => {
-      els.loginModal.classList.remove('hidden');
-    };
-    document.getElementById('btnCloseLogin').onclick = () => {
-      els.loginModal.classList.add('hidden');
-    };
-    document.getElementById('btnDoLogin').onclick = doLogin;
-    document.getElementById('btnUseDummy').onclick = fillDummyLogin;
-    document.getElementById('btnLogout').onclick = logout;
+    els.btnLogin.onclick = () => openAuthModal('login');
+    els.btnStartFree.onclick = () => appState.isLoggedIn ? showToast('OPEN DASHBOARD NEXT') : openAuthModal('signup');
+    els.btnHeroStartFree.onclick = () => appState.isLoggedIn ? showToast('OPEN DASHBOARD NEXT') : openAuthModal('signup');
+
+    document.getElementById('btnCloseLogin').onclick = closeAuthModal;
+    document.getElementById('btnDoAuth').onclick = doAuth;
+    els.btnUseDummy.onclick = fillDummyLogin;
+    els.btnLogout.onclick = logout;
+
+    els.authModeLogin.onclick = () => setAuthMode('login');
+    els.authModeSignup.onclick = () => setAuthMode('signup');
+    els.btnInlineAuthSwitch.onclick = () => setAuthMode((appState.authMode || 'login') === 'login' ? 'signup' : 'login');
 
     document.getElementById('btnJumpLive').onclick = () => {
       document.getElementById('liveTab').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1091,6 +1241,16 @@
       document.getElementById('uploadTab').classList.remove('hidden');
       document.getElementById('uploadTab').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !els.loginModal.classList.contains('hidden')) {
+        closeAuthModal();
+      }
+    });
+
+    els.loginModal.addEventListener('click', (e) => {
+      if (e.target === els.loginModal) closeAuthModal();
+    });
   </script>
 </body>
 </html>
