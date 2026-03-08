@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>EditForAll Dashboard — Clip it. Ship it. Pop it.</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Bangers&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              yellow: '#FFDE59',
+              pink: '#FF914D',
+              purple: '#8C52FF',
+              cyan: '#00BF63',
+              dark: '#1A1A1A'
+            }
+          },
+          boxShadow: {
+            'neo': '4px 4px 0px 0px #000000',
+            'neo-lg': '8px 8px 0px 0px #000000',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #f3f4f6;
+      background-image: radial-gradient(#000000 1.5px, transparent 1.5px);
+      background-size: 32px 32px;
+      background-attachment: fixed;
+      color: #1a1a1a;
+    }
+
+    .heading-font { font-family: 'Bangers', cursive; letter-spacing: 0.05em; }
+
+    .neo-card {
+      background: white;
+      border: 4px solid #000;
+      box-shadow: 8px 8px 0px 0px #000;
+      transition: all 0.2s ease;
+    }
+
+    .neo-btn {
+      border: 3px solid #000;
+      box-shadow: 4px 4px 0px 0px #000;
+      transition: all 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .neo-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px 0px #000;
+    }
+
+    .neo-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0px 0px 0px 0px #000;
+    }
+
+    .neo-input, .neo-select, .neo-textarea {
+      border: 4px solid #000;
+      padding: 1rem;
+      font-weight: 700;
+      outline: none;
+      background: white;
+      width: 100%;
+    }
+
+    .neo-input:focus, .neo-select:focus, .neo-textarea:focus {
+      background: #fffbeb;
+    }
+
+    .clip-selected {
+      outline: 5px solid #8C52FF;
+      background: #f5f3ff !important;
+    }
+
+    .sidebar-link.active {
+      background: #FFDE59;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="flex flex-wrap items-center justify-between gap-6 mb-8">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="neo-card bg-brand-yellow p-3 rotate-[-3deg]">
+          <span class="heading-font text-4xl">EFA</span>
+        </a>
+        <div>
+          <h1 class="heading-font text-5xl leading-none">EditForAll</h1>
+          <p class="font-bold text-sm bg-brand-cyan px-2 border-2 border-black inline-block mt-1 uppercase">
+            Dashboard
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <div id="userBadge" class="neo-card bg-white px-4 py-2 text-sm font-bold">Loading...</div>
+        <button id="btnBackHome" class="neo-btn bg-white px-4 py-2">Home</button>
+        <button id="btnLogout" class="neo-btn bg-brand-yellow px-4 py-2">Log Out</button>
+      </div>
+    </header>
+
+    <!-- Welcome -->
+    <section class="neo-card bg-white p-6 md:p-8 mb-8">
+      <div class="grid lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8">
+          <div class="inline-block neo-card bg-brand-pink px-3 py-1 text-xs font-black rotate-[-2deg] mb-4">
+            YOU'RE IN
+          </div>
+          <h2 class="heading-font text-5xl md:text-6xl leading-none">WELCOME TO YOUR CLIP HQ</h2>
+          <p class="mt-4 text-lg font-bold max-w-3xl">
+            Paste a live URL, paste a video link, or upload a file. Then tell EditForAll what kind of clips you want,
+            review the results, and post faster.
+          </p>
+        </div>
+        <div class="lg:col-span-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="neo-card bg-brand-yellow p-4 text-center">
+              <div class="text-xs font-black">CLIPS READY</div>
+              <div id="statClipsReady" class="text-3xl font-black mt-1">0</div>
+            </div>
+            <div class="neo-card bg-brand-cyan p-4 text-center">
+              <div class="text-xs font-black">CONNECTED</div>
+              <div id="statConnected" class="text-3xl font-black mt-1">0</div>
+            </div>
+            <div class="neo-card bg-brand-purple text-white p-4 text-center">
+              <div class="text-xs font-black">TARGET</div>
+              <div id="statTarget" class="text-lg font-black mt-2">NONE</div>
+            </div>
+            <div class="neo-card bg-brand-pink p-4 text-center">
+              <div class="text-xs font-black">MODE</div>
+              <div class="text-lg font-black mt-2">FREEMIUM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main -->
+    <section class="grid lg:grid-cols-12 gap-8">
+      <!-- Sidebar -->
+      <aside class="lg:col-span-3">
+        <div class="neo-card bg-white p-4 space-y-3 sticky top-6">
+          <button class="sidebar-link active neo-btn bg-white w-full py-3 justify-start px-4" data-panel="panelCreate">
+            Create Clips
+          </button>
+          <button class="sidebar-link neo-btn bg-white w-full py-3 justify-start px-4" data-panel="panelVault">
+            Vault
+          </button>
+          <button class="sidebar-link neo-btn bg-white w-full py-3 justify-start px-4" data-panel="panelAccounts">
+            Accounts
+          </button>
+          <button class="sidebar-link neo-btn bg-white w-full py-3 justify-start px-4" data-panel="panelSettings">
+            Settings
+          </button>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <div class="lg:col-span-9 space-y-8">
+        <!-- CREATE -->
+        <section id="panelCreate" class="dashboard-panel space-y-8">
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="neo-card bg-brand-yellow p-5">
+              <div class="heading-font text-3xl">PASTE LIVE URL</div>
+              <p class="mt-2 font-bold text-sm">Monitor live streams and pull moments while the stream is happening.</p>
+            </div>
+            <div class="neo-card bg-brand-cyan p-5">
+              <div class="heading-font text-3xl">PASTE VIDEO LINK</div>
+              <p class="mt-2 font-bold text-sm">Drop in a YouTube or video URL and generate clip ideas fast.</p>
+            </div>
+            <div class="neo-card bg-brand-purple text-white p-5">
+              <div class="heading-font text-3xl">UPLOAD FILE</div>
+              <p class="mt-2 font-bold text-sm">Upload a recorded file and turn it into short clips for social.</p>
+            </div>
+          </div>
+
+          <div class="neo-card bg-white p-6">
+            <h3 class="heading-font text-4xl mb-4">CREATE NEW CLIPS</h3>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="font-black text-sm">SOURCE TYPE</label>
+                <select id="sourceType" class="neo-select mt-2">
+                  <option value="live">Live stream URL</option>
+                  <option value="link">Video link</option>
+                  <option value="upload">Uploaded video</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="font-black text-sm">SCAN MODE</label>
+                <select id="scanMode" class="neo-select mt-2">
+                  <option value="balanced">Balanced</option>
+                  <option value="quick">Turbo</option>
+                  <option value="precision">Deep Scan</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="font-black text-sm">PASTE URL</label>
+              <input id="sourceUrl" type="url" class="neo-input mt-2" placeholder="https://youtube.com/watch?v=... or live stream URL">
+            </div>
+
+            <div class="mt-4">
+              <label class="font-black text-sm">UPLOAD VIDEO</label>
+              <input id="sourceFile" type="file" accept="video/*" class="neo-input mt-2">
+            </div>
+
+            <div class="mt-4">
+              <label class="font-black text-sm">AI INSTRUCTIONS</label>
+              <textarea id="aiInstructions" rows="4" class="neo-textarea mt-2" placeholder="5 clips evenly spread out, funny moments only, strong hooks, captions on..."></textarea>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button id="btnExamplePrompt" class="neo-btn bg-white px-4 py-3">Use Example</button>
+              <button id="btnGenerateClips" class="neo-btn bg-brand-cyan px-6 py-3">Generate Clips</button>
+            </div>
+          </div>
+
+          <div class="neo-card bg-brand-yellow p-6">
+            <div class="flex justify-between gap-4 items-center flex-wrap">
+              <div>
+                <div class="font-black text-sm">ACTIVE STRATEGY</div>
+                <div id="activeStrategy" class="text-lg font-black mt-1">NONE</div>
+              </div>
+              <div>
+                <div class="font-black text-sm">LAST ACTION</div>
+                <div id="lastAction" class="text-lg font-black mt-1">NONE</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VAULT -->
+        <section id="panelVault" class="dashboard-panel hidden space-y-6">
+          <div class="neo-card bg-white p-6">
+            <div class="flex justify-between items-center gap-4 flex-wrap">
+              <h3 class="heading-font text-4xl">THE VAULT</h3>
+              <div class="flex gap-3">
+                <button id="btnPostSelected" class="neo-btn bg-brand-cyan px-4 py-3">Post Selected</button>
+                <button id="btnClearVault" class="neo-btn bg-black text-white px-4 py-3">Clear Vault</button>
+              </div>
+            </div>
+
+            <div class="mt-4 neo-card bg-brand-pink p-4">
+              <div class="flex justify-between items-center gap-3 flex-wrap">
+                <span class="font-black text-sm">AUTO-UPLOAD TARGET:</span>
+                <span id="autoUploadTargetLabel" class="font-black">NONE</span>
+              </div>
+            </div>
+
+            <div id="clipList" class="mt-6 space-y-4">
+              <div class="text-center py-10 opacity-25 italic font-black">NO CLIPS YET</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCOUNTS -->
+        <section id="panelAccounts" class="dashboard-panel hidden space-y-6">
+          <div class="neo-card bg-white p-6">
+            <h3 class="heading-font text-4xl mb-4">CONNECTED ACCOUNTS</h3>
+
+            <div class="grid md:grid-cols-3 gap-4">
+              <div id="platformCard-youtube" class="neo-card bg-red-100 p-4">
+                <div class="font-black">YOUTUBE</div>
+                <div id="platformStatus-youtube" class="mt-2 text-sm font-bold">DISCONNECTED</div>
+                <div class="mt-4 flex gap-2">
+                  <button class="neo-btn bg-white text-xs px-3 py-2 connectBtn" data-platform="youtube">Connect</button>
+                  <button class="neo-btn bg-brand-yellow text-xs px-3 py-2 disconnectBtn" data-platform="youtube">Off</button>
+                </div>
+              </div>
+
+              <div id="platformCard-kick" class="neo-card bg-green-100 p-4">
+                <div class="font-black">KICK</div>
+                <div id="platformStatus-kick" class="mt-2 text-sm font-bold">DISCONNECTED</div>
+                <div class="mt-4 flex gap-2">
+                  <button class="neo-btn bg-white text-xs px-3 py-2 connectBtn" data-platform="kick">Connect</button>
+                  <button class="neo-btn bg-brand-yellow text-xs px-3 py-2 disconnectBtn" data-platform="kick">Off</button>
+                </div>
+              </div>
+
+              <div id="platformCard-twitch" class="neo-card bg-purple-100 p-4">
+                <div class="font-black">TWITCH</div>
+                <div id="platformStatus-twitch" class="mt-2 text-sm font-bold">DISCONNECTED</div>
+                <div class="mt-4 flex gap-2">
+                  <button class="neo-btn bg-white text-xs px-3 py-2 connectBtn" data-platform="twitch">Connect</button>
+                  <button class="neo-btn bg-brand-yellow text-xs px-3 py-2 disconnectBtn" data-platform="twitch">Off</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label class="font-black text-sm">DEFAULT AUTO-UPLOAD TARGET</label>
+              <select id="autoUploadTarget" class="neo-select mt-2">
+                <option value="">NONE</option>
+                <option value="youtube">YOUTUBE</option>
+                <option value="kick">KICK</option>
+                <option value="twitch">TWITCH</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="panelSettings" class="dashboard-panel hidden space-y-6">
+          <div class="neo-card bg-white p-6">
+            <h3 class="heading-font text-4xl mb-4">ACCOUNT SETTINGS</h3>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="font-black text-sm">NAME</label>
+                <input id="settingsName" type="text" class="neo-input mt-2" placeholder="Your name">
+              </div>
+              <div>
+                <label class="font-black text-sm">EMAIL</label>
+                <input id="settingsEmail" type="email" class="neo-input mt-2" placeholder="Your email">
+              </div>
+            </div>
+
+            <div class="mt-5 flex gap-3">
+              <button id="btnSaveSettings" class="neo-btn bg-brand-cyan px-4 py-3">Save Settings</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="neo-card bg-black text-white px-8 py-3 font-black italic">
+      <span id="toastText">DONE</span>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      state: 'efa_state_v3'
+    };
+
+    const DEFAULT_STATE = {
+      isLoggedIn: false,
+      userEmail: '',
+      strategy: '',
+      authMode: 'login',
+      connections: {
+        youtube: false,
+        kick: false,
+        twitch: false
+      },
+      autoUploadTarget: '',
+      clips: [],
+      selectedClipIds: [],
+      uploadFile: null,
+      users: [
+        {
+          name: 'Demo User',
+          email: 'test@editforall.com',
+          password: 'Password123!'
+        }
+      ]
+    };
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.state);
+        if (!raw) return structuredClone(DEFAULT_STATE);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(DEFAULT_STATE),
+          ...parsed,
+          connections: { ...DEFAULT_STATE.connections, ...(parsed.connections || {}) },
+          users: Array.isArray(parsed.users) && parsed.users.length ? parsed.users : structuredClone(DEFAULT_STATE.users)
+        };
+      } catch {
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(appState));
+    }
+
+    function showToast(txt) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastText').innerText = txt;
+      t.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.add('hidden'), 2200);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function generateClipId() {
+      return 'clip_' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function requireAuth() {
+      if (!appState.isLoggedIn || !appState.userEmail) {
+        window.location.href = 'index.html';
+      }
+    }
+
+    function getCurrentUser() {
+      return (appState.users || []).find(u => u.email.toLowerCase() === (appState.userEmail || '').toLowerCase()) || null;
+    }
+
+    function updateHeader() {
+      document.getElementById('userBadge').textContent = appState.userEmail || 'User';
+    }
+
+    function updateStats() {
+      document.getElementById('statClipsReady').textContent = appState.clips.length;
+      document.getElementById('statConnected').textContent =
+        Object.values(appState.connections || {}).filter(Boolean).length;
+      document.getElementById('statTarget').textContent = (appState.autoUploadTarget || 'NONE').toUpperCase();
+      document.getElementById('autoUploadTargetLabel').textContent = (appState.autoUploadTarget || 'NONE').toUpperCase();
+      document.getElementById('activeStrategy').textContent = (appState.strategy || 'NONE').toUpperCase();
+    }
+
+    function renderPanels() {
+      document.querySelectorAll('.sidebar-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sidebar-link').forEach(x => x.classList.remove('active'));
+          document.querySelectorAll('.dashboard-panel').forEach(x => x.classList.add('hidden'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.panel).classList.remove('hidden');
+        });
+      });
+    }
+
+    function renderConnections() {
+      ['youtube', 'kick', 'twitch'].forEach(platform => {
+        const card = document.getElementById(`platformCard-${platform}`);
+        const status = document.getElementById(`platformStatus-${platform}`);
+        const connected = !!appState.connections[platform];
+
+        card.classList.toggle('bg-white', !connected);
+        status.textContent = connected ? 'CONNECTED' : 'DISCONNECTED';
+      });
+
+      document.getElementById('autoUploadTarget').value = appState.autoUploadTarget || '';
+    }
+
+    function connectPlatform(platform) {
+      appState.connections[platform] = true;
+      if (!appState.autoUploadTarget) appState.autoUploadTarget = platform;
+      saveState();
+      renderConnections();
+      updateStats();
+      showToast(`${platform.toUpperCase()} CONNECTED`);
+    }
+
+    function disconnectPlatform(platform) {
+      appState.connections[platform] = false;
+      if (appState.autoUploadTarget === platform) appState.autoUploadTarget = '';
+      saveState();
+      renderConnections();
+      updateStats();
+      showToast(`${platform.toUpperCase()} DISCONNECTED`);
+    }
+
+    function setAutoUploadTarget(value) {
+      if (value && !appState.connections[value]) {
+        showToast(`CONNECT ${value.toUpperCase()} FIRST`);
+        document.getElementById('autoUploadTarget').value = appState.autoUploadTarget || '';
+        return;
+      }
+      appState.autoUploadTarget = value;
+      saveState();
+      updateStats();
+      showToast(`TARGET SET TO ${(value || 'NONE').toUpperCase()}`);
+    }
+
+    function renderClips() {
+      const clipList = document.getElementById('clipList');
+      clipList.innerHTML = '';
+
+      if (!appState.clips.length) {
+        clipList.innerHTML = `<div class="text-center py-10 opacity-25 italic font-black">NO CLIPS YET</div>`;
+        return;
+      }
+
+      appState.clips.forEach(clip => {
+        const selected = appState.selectedClipIds.includes(clip.id);
+
+        const card = document.createElement('div');
+        card.className = `neo-card p-4 ${selected ? 'clip-selected' : ''}`;
+        card.innerHTML = `
+          <div class="flex justify-between gap-3 mb-2 flex-wrap">
+            <span class="border-2 border-black px-2 font-black text-xs" style="background:${clip.color || '#FFDE59'}">
+              ${clip.score || 80}% VIRAL
+            </span>
+            <span class="font-mono font-bold">${clip.start || '--:--'}</span>
+          </div>
+
+          <div class="font-black text-xl italic underline underline-offset-4 break-words">${escapeHtml(clip.title || 'UNTITLED CLIP')}</div>
+
+          <div class="mt-2 text-xs font-bold uppercase opacity-70">
+            ${escapeHtml((clip.sourceType || 'unknown') + (clip.fileName ? ` • ${clip.fileName}` : ''))}
+          </div>
+
+          <div class="mt-4 flex gap-2 flex-wrap">
+            <button class="neo-btn bg-brand-cyan flex-1 py-2 text-xs btn-post-one" data-id="${clip.id}">Post</button>
+            <button class="neo-btn bg-white px-3 py-2 text-xs btn-toggle" data-id="${clip.id}">
+              ${selected ? 'Unselect' : 'Select'}
+            </button>
+            <button class="neo-btn bg-brand-yellow px-3 py-2 text-xs btn-rename" data-id="${clip.id}">Rename</button>
+            <button class="neo-btn bg-black text-white px-3 py-2 text-xs btn-delete" data-id="${clip.id}">Del</button>
+          </div>
+        `;
+        clipList.appendChild(card);
+      });
+
+      document.querySelectorAll('.btn-toggle').forEach(btn => {
+        btn.onclick = () => toggleClipSelection(btn.dataset.id);
+      });
+
+      document.querySelectorAll('.btn-post-one').forEach(btn => {
+        btn.onclick = () => postClip(btn.dataset.id);
+      });
+
+      document.querySelectorAll('.btn-rename').forEach(btn => {
+        btn.onclick = () => renameClip(btn.dataset.id);
+      });
+
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.onclick = () => deleteClip(btn.dataset.id);
+      });
+    }
+
+    function toggleClipSelection(id) {
+      const idx = appState.selectedClipIds.indexOf(id);
+      if (idx >= 0) appState.selectedClipIds.splice(idx, 1);
+      else appState.selectedClipIds.push(id);
+      saveState();
+      renderClips();
+    }
+
+    function postClip(id) {
+      const clip = appState.clips.find(c => c.id === id);
+      if (!clip) return;
+      const target = appState.autoUploadTarget || 'manual export';
+      showToast(`POSTED "${clip.title}" TO ${target.toUpperCase()}`);
+    }
+
+    function renameClip(id) {
+      const clip = appState.clips.find(c => c.id === id);
+      if (!clip) return;
+      const val = prompt('Rename clip:', clip.title);
+      if (!val || !val.trim()) return;
+      clip.title = val.trim().toUpperCase();
+      saveState();
+      renderClips();
+      showToast('CLIP RENAMED');
+    }
+
+    function deleteClip(id) {
+      appState.clips = appState.clips.filter(c => c.id !== id);
+      appState.selectedClipIds = appState.selectedClipIds.filter(x => x !== id);
+      saveState();
+      renderClips();
+      updateStats();
+      showToast('CLIP DELETED');
+    }
+
+    function clearVault() {
+      appState.clips = [];
+      appState.selectedClipIds = [];
+      saveState();
+      renderClips();
+      updateStats();
+      showToast('VAULT CLEARED');
+    }
+
+    function postSelected() {
+      const selected = appState.clips.filter(c => appState.selectedClipIds.includes(c.id));
+      if (!selected.length) {
+        showToast('SELECT CLIPS FIRST');
+        return;
+      }
+      const target = appState.autoUploadTarget || 'manual export';
+      showToast(`POSTED ${selected.length} CLIPS TO ${target.toUpperCase()}`);
+    }
+
+    function generateClips() {
+      const sourceType = document.getElementById('sourceType').value;
+      const sourceUrl = document.getElementById('sourceUrl').value.trim();
+      const scanMode = document.getElementById('scanMode').value;
+      const aiInstructions = document.getElementById('aiInstructions').value.trim();
+      const fileInput = document.getElementById('sourceFile');
+      const file = fileInput.files?.[0] || null;
+
+      if ((sourceType === 'live' || sourceType === 'link') && !sourceUrl) {
+        showToast('PASTE A URL FIRST');
+        return;
+      }
+
+      if (sourceType === 'upload' && !file) {
+        showToast('UPLOAD A FILE FIRST');
+        return;
+      }
+
+      appState.strategy = aiInstructions || `${scanMode} ${sourceType} clips`;
+
+      const templates = [
+        { title: 'HOOK MOMENT', start: '00:12', score: 94, color: '#FFDE59' },
+        { title: 'FUNNY REACTION', start: '01:03', score: 86, color: '#FF914D' },
+        { title: 'HIGH ENERGY CUT', start: '02:11', score: 89, color: '#8C52FF' },
+        { title: 'VALUE PACKED SEGMENT', start: '03:09', score: 81, color: '#00BF63' }
+      ];
+
+      let selectedTemplates = [...templates];
+      if (/funny|laugh/i.test(aiInstructions)) {
+        selectedTemplates = [
+          { title: 'FUNNY MOMENT', start: '00:42', score: 92, color: '#FF914D' },
+          { title: 'REACTION CLIP', start: '01:30', score: 87, color: '#FFDE59' },
+          { title: 'CHAT LOSING IT', start: '02:16', score: 84, color: '#8C52FF' }
+        ];
+      } else if (/hook|energy|viral/i.test(aiInstructions)) {
+        selectedTemplates = [
+          { title: 'VIRAL HOOK', start: '00:08', score: 96, color: '#FFDE59' },
+          { title: 'ENERGY SPIKE', start: '01:14', score: 90, color: '#8C52FF' },
+          { title: 'BIG PAYOFF', start: '02:28', score: 88, color: '#00BF63' }
+        ];
+      }
+
+      appState.clips = selectedTemplates.map((clip, i) => ({
+        ...clip,
+        id: generateClipId(),
+        title: clip.title + (scanMode === 'quick' ? ' - TURBO' : scanMode === 'precision' ? ' - DEEP SCAN' : ''),
+        sourceType,
+        sourceUrl: sourceUrl || '',
+        fileName: file ? file.name : ''
+      }));
+
+      appState.selectedClipIds = [];
+      saveState();
+      renderClips();
+      updateStats();
+      document.getElementById('lastAction').textContent = 'CLIPS GENERATED';
+      showToast(`GENERATED ${appState.clips.length} CLIPS`);
+    }
+
+    function saveSettings() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const name = document.getElementById('settingsName').value.trim();
+      const email = document.getElementById('settingsEmail').value.trim().toLowerCase();
+
+      if (!name || !email) {
+        showToast('NAME AND EMAIL REQUIRED');
+        return;
+      }
+
+      const emailTaken = appState.users.some(u => u.email.toLowerCase() === email && u.email.toLowerCase() !== user.email.toLowerCase());
+      if (emailTaken) {
+        showToast('EMAIL ALREADY EXISTS');
+        return;
+      }
+
+      user.name = name;
+      user.email = email;
+      appState.userEmail = email;
+      saveState();
+      updateHeader();
+      showToast('SETTINGS SAVED');
+    }
+
+    function hydrateSettings() {
+      const user = getCurrentUser();
+      if (!user) return;
+      document.getElementById('settingsName').value = user.name || '';
+      document.getElementById('settingsEmail').value = user.email || '';
+    }
+
+    function logout() {
+      appState.isLoggedIn = false;
+      appState.userEmail = '';
+      saveState();
+      window.location.href = 'index.html';
+    }
+
+    requireAuth();
+    updateHeader();
+    updateStats();
+    renderPanels();
+    renderConnections();
+    renderClips();
+    hydrateSettings();
+
+    document.querySelectorAll('.connectBtn').forEach(btn => {
+      btn.onclick = () => connectPlatform(btn.dataset.platform);
+    });
+
+    document.querySelectorAll('.disconnectBtn').forEach(btn => {
+      btn.onclick = () => disconnectPlatform(btn.dataset.platform);
+    });
+
+    document.getElementById('autoUploadTarget').onchange = (e) => setAutoUploadTarget(e.target.value);
+    document.getElementById('btnGenerateClips').onclick = generateClips;
+    document.getElementById('btnPostSelected').onclick = postSelected;
+    document.getElementById('btnClearVault').onclick = clearVault;
+    document.getElementById('btnSaveSettings').onclick = saveSettings;
+    document.getElementById('btnLogout').onclick = logout;
+    document.getElementById('btnBackHome').onclick = () => window.location.href = 'index.html';
+    document.getElementById('btnExamplePrompt').onclick = () => {
+      document.getElementById('aiInstructions').value = '5 clips evenly spread out, funny moments only, strong hooks, captions on';
+    };
+  </script>
+</body>
+</html>
