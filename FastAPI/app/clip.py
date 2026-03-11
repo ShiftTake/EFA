@@ -1,7 +1,22 @@
-import yt_dlp
+from scenedetect import VideoManager, SceneManager
+from scenedetect.detectors import ContentDetector
+import numpy as np
+import cv2
 
+import yt_dlp
+import uuid
+import os
+import ffmpeg
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
 from fastapi.responses import FileResponse
+from typing import List
+from .schemas import Clip
+
+CLIPS_DIR = os.path.join(os.path.dirname(__file__), 'clips')
+os.makedirs(CLIPS_DIR, exist_ok=True)
+
+router = APIRouter()
+
 # In-memory storage for demo
 clips_db = []
 
@@ -11,20 +26,6 @@ def download_clip(filename: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Clip not found")
     return FileResponse(file_path, media_type="video/mp4", filename=filename)
-from typing import List
-from .schemas import Clip
-
-import uuid
-import os
-import ffmpeg
-
-CLIPS_DIR = os.path.join(os.path.dirname(__file__), 'clips')
-os.makedirs(CLIPS_DIR, exist_ok=True)
-
-router = APIRouter()
-
-# In-memory storage for demo
-clips_db = []
 
 @router.get("/clips", response_model=List[Clip])
 def get_clips():
@@ -88,15 +89,34 @@ async def create_clips(
     file_name = file.filename if file else ""
     new_clips = []
     if input_path:
-        for clip in selected_templates:
-            # Simulate start time as seconds
-            start_sec = int(clip["start"].split(":")[0]) * 60 + int(clip["start"].split(":")[1])
+        # AI highlight extraction (energy-based placeholder)
+        highlights = []
+        cap = cv2.VideoCapture(input_path)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        window = int(fps * 2)  # 2-second window
+        energies = []
+        for i in range(frame_count):
+            ret, frame = cap.read()
+            if not ret:
+                break
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            energy = np.sum(gray.astype(np.float32) ** 2)
+            energies.append(energy)
+        cap.release()
+        energies = np.array(energies)
+        # Find peaks in energy
+        from scipy.signal import find_peaks
+        peaks, _ = find_peaks(energies, distance=window, prominence=np.max(energies)*0.2)
+        for idx, peak in enumerate(peaks):
+            start_sec = int(max(0, peak - window//2) / fps)
+            duration = int(window / fps)
             out_name = f"clip_{uuid.uuid4()}.mp4"
             out_path = os.path.join(CLIPS_DIR, out_name)
             try:
                 (
                     ffmpeg
-                    .input(input_path, ss=start_sec, t=10)  # 10s clip
+                    .input(input_path, ss=start_sec, t=duration)
                     .output(out_path, vcodec='libx264', acodec='aac')
                     .run(overwrite_output=True)
                 )
@@ -104,16 +124,53 @@ async def create_clips(
                 raise HTTPException(status_code=500, detail=f"FFmpeg error: {e}")
             new_clip = {
                 "id": str(uuid.uuid4()),
-                "title": clip["title"] + (scanMode == "quick" and " - TURBO" or scanMode == "precision" and " - DEEP SCAN" or ""),
-                "start": clip["start"],
-                "score": clip["score"],
-                "color": clip["color"],
+                "title": f"AI Highlight {idx+1}",
+                "start": f"{start_sec//60:02d}:{start_sec%60:02d}",
+                "score": 95,
+                "color": "#8C52FF",
                 "sourceType": sourceType,
                 "sourceUrl": sourceUrl,
                 "fileName": file_name,
                 "clipPath": out_name
             }
             new_clips.append(new_clip)
+        # Fallback to scene detection if no highlights
+        if not new_clips:
+            video_manager = VideoManager([input_path])
+            scene_manager = SceneManager()
+            scene_manager.add_detector(ContentDetector())
+            video_manager.start()
+            scene_manager.detect_scenes(frame_source=video_manager)
+            scene_list = scene_manager.get_scene_list()
+            video_manager.release()
+            if not scene_list:
+                scene_list = [(0, 10)]
+            for i, (start, end) in enumerate(scene_list):
+                start_sec = int(start.get_seconds())
+                duration = int(end.get_seconds()) - start_sec
+                out_name = f"clip_{uuid.uuid4()}.mp4"
+                out_path = os.path.join(CLIPS_DIR, out_name)
+                try:
+                    (
+                        ffmpeg
+                        .input(input_path, ss=start_sec, t=duration if duration > 0 else 10)
+                        .output(out_path, vcodec='libx264', acodec='aac')
+                        .run(overwrite_output=True)
+                    )
+                except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"FFmpeg error: {e}")
+                new_clip = {
+                    "id": str(uuid.uuid4()),
+                    "title": f"Scene {i+1}",
+                    "start": f"{start_sec//60:02d}:{start_sec%60:02d}",
+                    "score": 80,
+                    "color": "#FFDE59",
+                    "sourceType": sourceType,
+                    "sourceUrl": sourceUrl,
+                    "fileName": file_name,
+                    "clipPath": out_name
+                }
+                new_clips.append(new_clip)
         if sourceType == "upload":
             os.remove(input_path)
     else:
