@@ -13,3 +13,4 @@ class Clip(BaseModel):
     sourceType: str
     sourceUrl: str
     fileName: str
+    clipPath: str

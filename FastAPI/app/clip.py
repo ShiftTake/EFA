@@ -1,8 +1,24 @@
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
+from fastapi.responses import FileResponse
+# In-memory storage for demo
+clips_db = []
+
+@router.get("/clips/download/{filename}")
+def download_clip(filename: str):
+    file_path = os.path.join(CLIPS_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Clip not found")
+    return FileResponse(file_path, media_type="video/mp4", filename=filename)
 from typing import List
 from .schemas import Clip
+
 import uuid
+import os
+import ffmpeg
+
+CLIPS_DIR = os.path.join(os.path.dirname(__file__), 'clips')
+os.makedirs(CLIPS_DIR, exist_ok=True)
 
 router = APIRouter()
 
@@ -53,18 +69,51 @@ async def create_clips(
         ]
     file_name = file.filename if file else ""
     new_clips = []
-    for clip in selected_templates:
-        new_clip = {
-            "id": str(uuid.uuid4()),
-            "title": clip["title"] + (scanMode == "quick" and " - TURBO" or scanMode == "precision" and " - DEEP SCAN" or ""),
-            "start": clip["start"],
-            "score": clip["score"],
-            "color": clip["color"],
-            "sourceType": sourceType,
-            "sourceUrl": sourceUrl,
-            "fileName": file_name
-        }
-        new_clips.append(new_clip)
+    if file:
+        input_path = os.path.join(CLIPS_DIR, f"input_{uuid.uuid4()}_{file.filename}")
+        with open(input_path, "wb") as f:
+            f.write(await file.read())
+        for clip in selected_templates:
+            # Simulate start time as seconds
+            start_sec = int(clip["start"].split(":")[0]) * 60 + int(clip["start"].split(":")[1])
+            out_name = f"clip_{uuid.uuid4()}.mp4"
+            out_path = os.path.join(CLIPS_DIR, out_name)
+            try:
+                (
+                    ffmpeg
+                    .input(input_path, ss=start_sec, t=10)  # 10s clip
+                    .output(out_path, vcodec='libx264', acodec='aac')
+                    .run(overwrite_output=True)
+                )
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"FFmpeg error: {e}")
+            new_clip = {
+                "id": str(uuid.uuid4()),
+                "title": clip["title"] + (scanMode == "quick" and " - TURBO" or scanMode == "precision" and " - DEEP SCAN" or ""),
+                "start": clip["start"],
+                "score": clip["score"],
+                "color": clip["color"],
+                "sourceType": sourceType,
+                "sourceUrl": sourceUrl,
+                "fileName": file_name,
+                "clipPath": out_name
+            }
+            new_clips.append(new_clip)
+        os.remove(input_path)
+    else:
+        for clip in selected_templates:
+            new_clip = {
+                "id": str(uuid.uuid4()),
+                "title": clip["title"] + (scanMode == "quick" and " - TURBO" or scanMode == "precision" and " - DEEP SCAN" or ""),
+                "start": clip["start"],
+                "score": clip["score"],
+                "color": clip["color"],
+                "sourceType": sourceType,
+                "sourceUrl": sourceUrl,
+                "fileName": file_name,
+                "clipPath": ""
+            }
+            new_clips.append(new_clip)
     clips_db.clear()
     clips_db.extend(new_clips)
     return clips_db
