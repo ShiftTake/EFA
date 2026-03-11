@@ -1,3 +1,4 @@
+import yt_dlp
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
 from fastapi.responses import FileResponse
@@ -42,11 +43,28 @@ async def create_clips(
         raise HTTPException(status_code=400, detail="Invalid sourceType")
     if sourceType in ["live", "link"] and not sourceUrl:
         raise HTTPException(status_code=400, detail="URL required for live/link source")
-    if sourceType == "upload":
+    input_path = None
+    if sourceType == "link":
+        # Download video using yt-dlp
+        ydl_opts = {
+            'outtmpl': os.path.join(CLIPS_DIR, f"input_%(id)s.%(ext)s"),
+            'format': 'mp4/bestvideo+bestaudio/best',
+            'quiet': True
+        }
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(sourceUrl, download=True)
+                input_path = ydl.prepare_filename(info)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"yt-dlp error: {e}")
+    elif sourceType == "upload":
         if not file:
             raise HTTPException(status_code=400, detail="File required for upload source")
         if not file.filename.lower().endswith(('.mp4', '.mov', '.avi', '.mkv')):
             raise HTTPException(status_code=400, detail="Unsupported file type")
+        input_path = os.path.join(CLIPS_DIR, f"input_{uuid.uuid4()}_{file.filename}")
+        with open(input_path, "wb") as f:
+            f.write(await file.read())
 
     templates = [
         {"title": "HOOK MOMENT", "start": "00:12", "score": 94, "color": "#FFDE59"},
@@ -69,10 +87,7 @@ async def create_clips(
         ]
     file_name = file.filename if file else ""
     new_clips = []
-    if file:
-        input_path = os.path.join(CLIPS_DIR, f"input_{uuid.uuid4()}_{file.filename}")
-        with open(input_path, "wb") as f:
-            f.write(await file.read())
+    if input_path:
         for clip in selected_templates:
             # Simulate start time as seconds
             start_sec = int(clip["start"].split(":")[0]) * 60 + int(clip["start"].split(":")[1])
@@ -99,7 +114,8 @@ async def create_clips(
                 "clipPath": out_name
             }
             new_clips.append(new_clip)
-        os.remove(input_path)
+        if sourceType == "upload":
+            os.remove(input_path)
     else:
         for clip in selected_templates:
             new_clip = {
